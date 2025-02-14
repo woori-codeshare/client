@@ -68,8 +68,8 @@ export default function Home() {
       description,
       code,
     };
-    setSnapshots([...snapshots, newSnapshot]);
-    setCurrentVersion(snapshots.length);
+    setSnapshots([newSnapshot, ...snapshots]);
+    setCurrentVersion(0); // 새로운 스냅샷이 항상 인덱스 0이 됨
   };
 
   /**
