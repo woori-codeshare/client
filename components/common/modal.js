@@ -7,6 +7,7 @@ import { useEffect } from "react";
  * @param {Function} props.onClose - 모달 닫기 함수
  * @param {ReactNode} props.children - 모달 내부 컨텐츠
  * @param {boolean} props.allowBackdropClose - 백드롭 클릭 시 닫기 허용 여부
+ * @param {boolean} props.closeButton - 닫기 버튼 표시 여부
  * @returns
  */
 export default function Modal({
@@ -14,6 +15,7 @@ export default function Modal({
   onClose,
   children,
   allowBackdropClose = true,
+  closeButton = false,
 }) {
   // ESC 키를 눌렀을 때 모달을 닫는 이벤트 핸들러 등록
   useEffect(() => {
@@ -53,12 +55,14 @@ export default function Modal({
       {/* 모달 창: 실제 컨텐츠를 포함하는 박스 */}
       <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 w-[480px] relative">
         {/* 닫기 버튼 */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-300"
-        >
-          ✕
-        </button>
+        {closeButton && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-300"
+          >
+            ✕
+          </button>
+        )}
         {/* 모달 내부 컨텐츠 */}
         {children}
       </div>
