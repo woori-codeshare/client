@@ -6,9 +6,15 @@ import { useEffect } from "react";
  * @param {boolean} props.isOpen - 모달 표시 여부
  * @param {Function} props.onClose - 모달 닫기 함수
  * @param {ReactNode} props.children - 모달 내부 컨텐츠
+ * @param {boolean} props.allowBackdropClose - 백드롭 클릭 시 닫기 허용 여부
  * @returns
  */
-export default function Modal({ isOpen, onClose, children }) {
+export default function Modal({
+  isOpen,
+  onClose,
+  children,
+  allowBackdropClose = true,
+}) {
   // ESC 키를 눌렀을 때 모달을 닫는 이벤트 핸들러 등록
   useEffect(() => {
     const handleEsc = (e) => {
@@ -33,7 +39,7 @@ export default function Modal({ isOpen, onClose, children }) {
 
   // 모달 외부 영역(백드롭) 클릭 시 모달 닫기
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
+    if (allowBackdropClose && e.target === e.currentTarget) {
       onClose();
     }
   };

@@ -11,7 +11,7 @@ export default function RoomCreateModal({ isOpen, onClose, onSubmit }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} allowBackdropClose={false}>
       <h2 className="text-xl font-semibold text-gray-200 mb-4">방 생성</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
