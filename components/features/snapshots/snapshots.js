@@ -1,5 +1,6 @@
 import { FaHistory } from "react-icons/fa";
 import SnapshotItem from "./snapshot-item";
+import LiveSession from "../live-session/live-session";
 
 /**
  * 스냅샷 목록을 관리하고 표시하는 컴포넌트
@@ -23,6 +24,9 @@ export default function Snapshots({
 
   return (
     <div className="h-full p-2">
+      {/* 실시간 코딩 세션 */}
+      <LiveSession />
+
       {/* 헤더 섹션 */}
       <div className="flex items-center gap-2 mb-2">
         <FaHistory className="text-blue-400" />
@@ -33,7 +37,7 @@ export default function Snapshots({
       </div>
 
       {/* 스냅샷 리스트 */}
-      <div className="space-y-1 overflow-hidden">
+      <div className="space-y-1 overflow-y-auto">
         {snapshots.map((snapshot, index) => (
           <SnapshotItem
             key={snapshot.id}
