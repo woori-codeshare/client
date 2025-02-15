@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { FaQuestion, FaVoteYea, FaHistory } from "react-icons/fa";
 import CodeEditor from "@/components/editor/code-editor";
-import Snapshots from "@/components/features/snapshots/snapshots";
+import VersionsPanel from "@/components/features/versions/versions-panel";
 import QuestionsPanel from "@/components/features/questions/questions-panel";
 import VotingPanel from "@/components/features/voting/voting-panel";
 import ResizeHandle from "@/components/common/resize-handle";
@@ -127,7 +127,7 @@ export default function Home() {
             ${isSidebarOpen ? "w-[calc(100%-3rem)]" : "w-0 overflow-hidden"}
           `}
         >
-          <Snapshots
+          <VersionsPanel
             snapshots={snapshots}
             currentVersion={currentVersion}
             setCurrentVersion={handleVersionChange}

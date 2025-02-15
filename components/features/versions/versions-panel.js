@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
  * @param {number} props.currentVersion - 현재 선택된 버전 인덱스
  * @param {Function} props.setCurrentVersion - 버전 변경 함수
  */
-export default function Snapshots({
+export default function VersionsPanel({
   snapshots,
   currentVersion,
   setCurrentVersion,
