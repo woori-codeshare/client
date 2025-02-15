@@ -42,7 +42,7 @@ export default function CodeEditor({
    * @param {Object} snapshotData - 스냅샷 제목과 설명 데이터
    */
   const handleCreateSnapshot = (snapshotData) => {
-    onCreateSnapshot(snapshotData.title, snapshotData.description);
+    onCreateSnapshot(snapshotData);
   };
 
   /**

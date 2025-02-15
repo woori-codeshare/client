@@ -8,6 +8,7 @@ import CodeEditorLayout from "@/components/layout/code-editor-layout";
 import RoomEnterModal from "@/components/features/room/room-enter-modal";
 import { RoomStorage } from "@/utils/room-storage";
 import { useAlert } from "@/contexts/alert-context";
+import { sanitizeCode, desanitizeCode } from "@/utils/code-formatter";
 
 /**
  * 코드 공유 방 페이지
@@ -17,13 +18,17 @@ export default function CodeShareRoomPage() {
   const router = useRouter();
   const { id } = useParams();
   const { showAlert } = useAlert();
-  const [showEnterModal, setShowEnterModal] = useState(false); // 초기값을 false로 변경
-  const [isAuthorized, setIsAuthorized] = useState(false);
 
-  // 상태 관리
-  const [code, setCode] = useState(INITIAL_CODE);
+  // Room state
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [showEnterModal, setShowEnterModal] = useState(false);
+
+  // Editor state
+  const [code, setCode] = useState(desanitizeCode(INITIAL_CODE));
   const [snapshots, setSnapshots] = useState([]);
   const [currentVersion, setCurrentVersion] = useState(null);
+
+  // Layout state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activePanel, setActivePanel] = useState(PANEL_CONFIGS.QUESTIONS.id);
   const [leftWidth, setLeftWidth] = useState(INITIAL_WIDTHS.LEFT);
@@ -68,12 +73,15 @@ export default function CodeShareRoomPage() {
         return;
       }
 
-      RoomStorage.saveRoom({
+      const roomInfo = {
         uuid: id,
+        roomId: data.data.roomId,
         title: data.data.title,
         isCreator: false,
         isAuthorized: true,
-      });
+      };
+
+      RoomStorage.saveRoom(roomInfo);
 
       showAlert("방에 입장하는데 성공하였습니다.", "success");
       setIsAuthorized(true);
@@ -120,18 +128,51 @@ export default function CodeShareRoomPage() {
   /**
    * 새로운 스냅샷 생성
    */
-  const createSnapshot = (title = "", description = "") => {
+  const createSnapshot = async (snapshotData) => {
     if (!code) return;
 
-    const newSnapshot = {
-      id: Date.now(),
-      timestamp: new Date(),
-      title: title || `Snapshot ${snapshots.length + 1}`,
-      description,
-      code,
-    };
+    const room = RoomStorage.getRoom(id);
+    const roomId = room?.roomId;
 
-    setSnapshots((prev) => [newSnapshot, ...prev]);
+    if (!roomId) {
+      showAlert("방 정보를 찾을 수 없습니다.", "error");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/rooms/${id}/snapshots`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId,
+          title: snapshotData.title,
+          description: snapshotData.description,
+          code: sanitizeCode(code),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showAlert(data.error || "스냅샷 생성에 실패했습니다.", "error");
+        return;
+      }
+
+      const newSnapshot = {
+        id: data.data.snapshotId,
+        timestamp: new Date(data.data.createdAt),
+        title: data.data.title,
+        description: data.data.description,
+        code: data.data.code,
+      };
+
+      setSnapshots((prev) => [newSnapshot, ...prev]);
+      showAlert("스냅샷이 생성되었습니다.", "success");
+    } catch (error) {
+      showAlert("서버 오류가 발생했습니다.", "error");
+    }
   };
 
   /**
@@ -144,7 +185,7 @@ export default function CodeShareRoomPage() {
     }
 
     if (snapshots[index]) {
-      setCode(snapshots[index].code);
+      setCode(desanitizeCode(snapshots[index].code));
       setCurrentVersion(index);
     }
   };
