@@ -6,6 +6,7 @@ import { INITIAL_CODE } from "@/constants/initial-data";
 import RoomCreateModal from "@/components/features/room/room-create-modal";
 import { useRouter } from "next/navigation";
 import { INITIAL_WIDTHS, PANEL_CONFIGS } from "@/constants/panel-config";
+import { RoomStorage } from "@/utils/room-storage";
 
 /**
  * 방 생성 페이지
@@ -33,6 +34,13 @@ export default function CreateRoomPage() {
       if (!response.ok) {
         throw new Error(data.error);
       }
+
+      // 방 생성 후 방장 정보 저장
+      RoomStorage.saveRoom({
+        uuid: data.data.uuid,
+        title: title,
+        isCreator: true,
+      });
 
       router.push(`/${data.data.uuid}`);
     } catch (error) {
