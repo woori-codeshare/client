@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import { formatRelativeTime, truncateText } from "@/utils/formatters";
 
 /**
@@ -7,8 +8,14 @@ import { formatRelativeTime, truncateText } from "@/utils/formatters";
  * @param {Object} props.snapshot - 스냅샷 데이터 객체 (제목, 설명, 타임스탬프 포함)
  * @param {boolean} props.isActive - 현재 선택된 스냅샷 여부
  * @param {Function} props.onClick - 스냅샷 클릭 시 실행될 핸들러 함수
+ * @param {string} props.layoutId - 레이아웃 애니메이션을 위한 ID
  */
-export default function SnapshotItem({ snapshot, isActive, onClick }) {
+export default function SnapshotItem({
+  snapshot,
+  isActive,
+  onClick,
+  layoutId,
+}) {
   // 포맷팅된 시간을 저장하는 상태
   const [formattedTime, setFormattedTime] = useState("");
 
@@ -33,29 +40,80 @@ export default function SnapshotItem({ snapshot, isActive, onClick }) {
   }, [updateTime]);
 
   return (
-    <div
+    <motion.div
+      layoutId={layoutId}
+      layout // 레이아웃 애니메이션 활성화
+      initial={{
+        opacity: 0,
+        y: -15,
+        scale: 0.97,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: {
+          type: "spring",
+          stiffness: 500,
+          damping: 25,
+          mass: 1,
+        },
+      }}
+      exit={{
+        opacity: 0,
+        scale: 0.97,
+        transition: {
+          duration: 0.15,
+        },
+      }}
       onClick={onClick}
       className={`
-        p-2 rounded-lg cursor-pointer whitespace-nowrap
+        group p-2.5 rounded-lg cursor-pointer 
+        transition-colors duration-200 relative
         ${
           isActive
-            ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-            : "hover:bg-gray-800 border border-transparent"
+            ? "bg-blue-500/20 border border-blue-500/30"
+            : "hover:bg-gray-800/50 border border-transparent hover:border-gray-700"
         }
       `}
     >
+      {/* 타임스탬프 */}
+      <div className="flex items-center gap-2 mb-1">
+        <div
+          className={`
+          text-xs
+          ${isActive ? "text-blue-400" : "text-gray-500"}
+        `}
+        >
+          {formattedTime}
+        </div>
+      </div>
+
       {/* 스냅샷 제목 */}
-      <div className="font-medium text-sm">{snapshot.title}</div>
+      <div
+        className={`
+        font-medium text-sm truncate
+        ${
+          isActive ? "text-blue-400" : "text-gray-200 group-hover:text-blue-400"
+        }
+      `}
+      >
+        {snapshot.title}
+      </div>
 
       {/* 스냅샷 설명 (존재하는 경우에만 표시) */}
       {snapshot.description && (
-        <div className="text-xs text-gray-400 mt-1 whitespace-normal">
-          {truncateText(snapshot.description)}
+        <div className="text-xs text-gray-400 mt-1.5 line-clamp-2">
+          {snapshot.description}
         </div>
       )}
 
-      {/* 상대적 시간 표시 (예: "5분 전") */}
-      <div className="text-xs text-gray-500 mt-1">{formattedTime}</div>
-    </div>
+      {/* 활성화 상태 표시 도트 - 구조 수정 */}
+      {isActive && (
+        <div className="absolute -left-[3px] top-1/2 -translate-y-1/2">
+          <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+        </div>
+      )}
+    </motion.div>
   );
 }

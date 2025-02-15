@@ -63,16 +63,18 @@ export default function Home() {
   /**
    * 새로운 스냅샷 생성
    */
-  const createSnapshot = (title, description = "") => {
+  const createSnapshot = (title = "", description = "") => {
+    if (!code) return;
+
     const newSnapshot = {
-      id: snapshots.length + 1,
-      timestamp: new Date().toISOString(),
-      title,
+      id: Date.now(),
+      timestamp: new Date(),
+      title: title || `Snapshot ${snapshots.length + 1}`,
       description,
       code,
     };
-    setSnapshots([newSnapshot, ...snapshots]);
-    setCurrentVersion(0); // 새로운 스냅샷이 항상 인덱스 0이 됨
+
+    setSnapshots((prev) => [newSnapshot, ...prev]);
   };
 
   /**

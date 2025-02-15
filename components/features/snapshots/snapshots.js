@@ -1,6 +1,7 @@
 import { FaHistory } from "react-icons/fa";
 import SnapshotItem from "./snapshot-item";
 import CurrentSession from "./session";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * 스냅샷 목록을 관리하고 표시하는 컴포넌트
@@ -56,16 +57,22 @@ export default function Snapshots({
       </div>
 
       {/* 스냅샷 리스트 */}
-      <div className="space-y-1 overflow-hidden">
-        {snapshots.map((snapshot, index) => (
-          <SnapshotItem
-            key={snapshot.id}
-            snapshot={snapshot}
-            isActive={currentVersion === index}
-            onClick={() => handleSnapshotSelect(index)}
-          />
-        ))}
-      </div>
+      <motion.div
+        className="space-y-1 overflow-y-auto mt-2"
+        layout // 레이아웃 애니메이션 추가
+      >
+        <AnimatePresence mode="popLayout" initial={false}>
+          {snapshots.map((snapshot, index) => (
+            <SnapshotItem
+              key={snapshot.id}
+              snapshot={snapshot}
+              isActive={currentVersion === index}
+              onClick={() => handleSnapshotSelect(index)}
+              layoutId={`snapshot-${snapshot.id}`} // 고유 레이아웃 ID 추가
+            />
+          ))}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
