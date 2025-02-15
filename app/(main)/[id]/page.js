@@ -24,6 +24,9 @@ export default function Home() {
   const [leftWidth, setLeftWidth] = useState(INITIAL_WIDTHS.LEFT);
   const [rightWidth, setRightWidth] = useState(INITIAL_WIDTHS.RIGHT);
 
+  // 스냅샷이 선택되었는지 여부로 readOnly 상태 결정
+  const isReadOnly = currentVersion !== null;
+
   /**
    * 우측 패널(질문, 투표) 토글 처리
    */
@@ -148,6 +151,7 @@ export default function Home() {
             onCreateSnapshot={createSnapshot}
             isSidebarOpen={isSidebarOpen}
             isRightPanelOpen={!!activePanel}
+            isReadOnly={isReadOnly}
           />
         </div>
       </div>

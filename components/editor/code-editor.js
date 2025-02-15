@@ -9,23 +9,25 @@ import CreateSnapshotModal from "./create-snapshot-modal";
  * @param {Function} props.onCodeChange - 코드 변경 시 호출될 함수
  * @param {Function} props.onCreateSnapshot - 스냅샷 생성 시 호출될 함수
  * @param {string} props.className - 추가 스타일 클래스
+ * @param {boolean} props.isReadOnly - 읽기 전용 모드 여부
  */
 export default function CodeEditor({
   code,
   onCodeChange,
   onCreateSnapshot,
   className = "",
+  isReadOnly = false,
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   /**
    * 키보드 단축키 이벤트 핸들러 등록
-   * Ctrl+S 또는 Cmd+S 입력 시 스냅샷 생성 모달 표시
+   * readOnly 모드가 아닐 때만 단축키 동작
    */
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+      if (!isReadOnly && (e.ctrlKey || e.metaKey) && e.key === "s") {
         e.preventDefault(); // 브라우저 기본 저장 동작 방지
         setIsModalOpen(true);
       }
@@ -33,7 +35,7 @@ export default function CodeEditor({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [isReadOnly]);
 
   /**
    * 스냅샷 생성 처리
@@ -77,13 +79,15 @@ export default function CodeEditor({
           </button>
 
           {/* 스냅샷 생성 버튼 */}
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="p-2 text-gray-400 hover:text-blue-400 transition-colors rounded hover:bg-gray-800"
-            title="스냅샷"
-          >
-            <FaCamera size={14} />
-          </button>
+          {!isReadOnly && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="p-2 text-gray-400 hover:text-blue-400 transition-colors rounded hover:bg-gray-800"
+              title="스냅샷"
+            >
+              <FaCamera size={14} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -94,6 +98,7 @@ export default function CodeEditor({
           onChange={(e) => onCodeChange(e.target.value)}
           className="w-full h-full bg-transparent resize-none focus:outline-none text-green-400 overflow-auto"
           spellCheck="false"
+          readOnly={isReadOnly}
         />
       </div>
 
