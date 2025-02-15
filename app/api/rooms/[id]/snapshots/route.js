@@ -5,6 +5,42 @@
 import { NextResponse } from "next/server";
 
 /**
+ * 코드 스냅샷 조회 요청을 처리합니다.
+ *
+ * @param {Request} request - HTTP 요청 객체
+ * @param {Object} params - 라우트 파라미터
+ * @returns {Promise<NextResponse>} JSON 응답
+ */
+export async function GET(request, { params }) {
+  try {
+    const { id } = params;
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const response = await fetch(`${API_URL}/api/v1/snapshots/${id}/`, {
+      headers: {
+        accept: "application/json;charset=UTF-8",
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return NextResponse.json(
+          { error: data.message || "스냅샷 조회에 실패했습니다." },
+          { status: response.status }
+      );
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+        { error: "서버 에러가 발생했습니다." },
+        { status: 500 }
+    );
+  }
+}
+
+/**
  * 코드 스냅샷 생성 요청을 처리합니다.
  *
  * @param {Request} request - HTTP 요청 객체
