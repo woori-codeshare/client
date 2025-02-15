@@ -6,10 +6,10 @@ import { INITIAL_WIDTHS, PANEL_CONFIGS } from "@/constants/panel-config";
 import CodeEditorLayout from "@/components/layout/code-editor-layout";
 
 /**
- * 메인 페이지 컴포넌트
- * 코드 에디터와 사이드 패널들을 관리하는 최상위 컴포넌트
+ * 코드 공유 방 페이지
+ * 실시간 코드 공유와 협업 기능을 제공하는 페이지 컴포넌트
  */
-export default function Home() {
+export default function CodeShareRoomPage() {
   // 상태 관리
   const [code, setCode] = useState(INITIAL_CODE);
   const [snapshots, setSnapshots] = useState([]);

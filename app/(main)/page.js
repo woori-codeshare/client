@@ -7,7 +7,11 @@ import RoomCreateModal from "@/components/features/room/room-create-modal";
 import { useRouter } from "next/navigation";
 import { INITIAL_WIDTHS, PANEL_CONFIGS } from "@/constants/panel-config";
 
-export default function Home() {
+/**
+ * 방 생성 페이지
+ * 새로운 코드 공유 방을 생성하는 페이지 컴포넌트
+ */
+export default function CreateRoomPage() {
   const router = useRouter();
   const [showCreateModal, setShowCreateModal] = useState(true);
   const [code, setCode] = useState(INITIAL_CODE);
