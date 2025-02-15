@@ -17,7 +17,10 @@ export async function POST(request) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.message || "방 생성에 실패했습니다." },
+        {
+          error: data.errorMessage || "방 생성에 실패했습니다.",
+          code: data.errorCode,
+        },
         { status: response.status }
       );
     }

@@ -33,7 +33,10 @@ export async function POST(request, { params }) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.message || "방 입장에 실패했습니다." },
+        {
+          error: data.errorMessage || "방 입장에 실패했습니다.",
+          code: data.errorCode,
+        },
         { status: response.status }
       );
     }

@@ -7,6 +7,7 @@ import RoomCreateModal from "@/components/features/room/room-create-modal";
 import { useRouter } from "next/navigation";
 import { INITIAL_WIDTHS, PANEL_CONFIGS } from "@/constants/panel-config";
 import { RoomStorage } from "@/utils/room-storage";
+import { useAlert } from "@/contexts/alert-context";
 
 /**
  * 방 생성 페이지
@@ -14,6 +15,7 @@ import { RoomStorage } from "@/utils/room-storage";
  */
 export default function CreateRoomPage() {
   const router = useRouter();
+  const { showAlert } = useAlert();
   const [showCreateModal, setShowCreateModal] = useState(true);
   const [code, setCode] = useState(INITIAL_CODE);
   const [activePanel, setActivePanel] = useState(PANEL_CONFIGS.QUESTIONS.id);
@@ -32,7 +34,8 @@ export default function CreateRoomPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error);
+        showAlert(data.error || "방 생성에 실패했습니다.", "error");
+        return;
       }
 
       // 방 생성 후 방장 정보 저장
@@ -42,10 +45,11 @@ export default function CreateRoomPage() {
         isCreator: true,
       });
 
+      showAlert("방이 성공적으로 생성되었습니다.", "success");
       router.push(`/${data.data.uuid}`);
     } catch (error) {
       console.error("방 생성 실패:", error);
-      // TODO: 에러 처리
+      showAlert("서버 오류가 발생했습니다.", "error");
     }
   };
 

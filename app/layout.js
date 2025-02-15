@@ -1,5 +1,6 @@
 import "./globals.css";
 import Header from "../components/layout/header";
+import { AlertProvider } from "@/contexts/alert-context";
 
 export const metadata = {
   title: "Create Next App",
@@ -8,7 +9,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning className="overflow-hidden">
+    <html lang="ko" suppressHydrationWarning className="overflow-hidden">
       <head>
         <meta name="grammarly-verification" content="off" />
         <style>
@@ -27,8 +28,10 @@ export default function RootLayout({ children }) {
         className="bg-gray-900 text-gray-100 overflow-hidden"
         suppressHydrationWarning
       >
-        <Header />
-        {children}
+        <AlertProvider>
+          <Header />
+          {children}
+        </AlertProvider>
       </body>
     </html>
   );

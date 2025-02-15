@@ -7,6 +7,7 @@ import { INITIAL_WIDTHS, PANEL_CONFIGS } from "@/constants/panel-config";
 import CodeEditorLayout from "@/components/layout/code-editor-layout";
 import RoomEnterModal from "@/components/features/room/room-enter-modal";
 import { RoomStorage } from "@/utils/room-storage";
+import { useAlert } from "@/contexts/alert-context";
 
 /**
  * 코드 공유 방 페이지
@@ -15,6 +16,7 @@ import { RoomStorage } from "@/utils/room-storage";
 export default function CodeShareRoomPage() {
   const router = useRouter();
   const { id } = useParams();
+  const { showAlert } = useAlert();
   const [showEnterModal, setShowEnterModal] = useState(false); // 초기값을 false로 변경
   const [isAuthorized, setIsAuthorized] = useState(false);
 
@@ -36,14 +38,16 @@ export default function CodeShareRoomPage() {
       const hasAccess = RoomStorage.hasAccess(id);
       setIsAuthorized(hasAccess);
 
-      // 접근 권한이 없는 경우에만 모달 표시
-      if (!hasAccess) {
+      if (hasAccess) {
+        // 이미 인증된 사용자인 경우
+        showAlert("방에 입장하는데 성공하였습니다.", "success");
+      } else {
         setShowEnterModal(true);
       }
     };
 
     checkAccess();
-  }, [id]);
+  }, [id, showAlert]);
 
   /**
    * 방 입장 처리
@@ -57,23 +61,26 @@ export default function CodeShareRoomPage() {
         }
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Invalid password");
+        showAlert(data.error || "방 입장에 실패했습니다.", "error");
+        return;
       }
 
-      const data = await response.json();
       RoomStorage.saveRoom({
         uuid: id,
         title: data.data.title,
         isCreator: false,
-        isAuthorized: true, // 성공적으로 인증된 경우
+        isAuthorized: true,
       });
 
+      showAlert("방에 입장하는데 성공하였습니다.", "success");
       setIsAuthorized(true);
       setShowEnterModal(false);
     } catch (error) {
       console.error("방 입장 실패:", error);
-      // TODO: Show error message to user
+      showAlert("서버 오류가 발생했습니다.", "error");
     }
   };
 
