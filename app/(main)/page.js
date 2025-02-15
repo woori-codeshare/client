@@ -39,11 +39,15 @@ export default function CreateRoomPage() {
       }
 
       // 방 생성 후 방장 정보 저장
-      RoomStorage.saveRoom({
+      const roomInfo = {
         uuid: data.data.uuid,
+        roomId: data.data.roomId,
         title: title,
         isCreator: true,
-      });
+        isAuthorized: true,
+      };
+
+      RoomStorage.saveRoom(roomInfo);
 
       showAlert("방이 성공적으로 생성되었습니다.", "success");
       router.push(`/${data.data.uuid}`);

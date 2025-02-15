@@ -30,6 +30,7 @@ export const RoomStorage = {
    * 새로운 방 정보를 저장하거나 기존 방 정보를 업데이트합니다.
    * @param {Object} roomInfo - 저장할 방 정보
    * @param {string} roomInfo.uuid - 방의 고유 식별자
+   * @param {number} roomInfo.roomId - 방의 ID
    * @param {string} roomInfo.title - 방 제목
    * @param {boolean} roomInfo.isCreator - 현재 사용자가 방장인지 여부
    * @param {boolean} [roomInfo.isAuthorized=false] - 인증된 사용자인지 여부
@@ -38,6 +39,7 @@ export const RoomStorage = {
     const rooms = this.getRooms();
     rooms[roomInfo.uuid] = {
       uuid: roomInfo.uuid,
+      roomId: roomInfo.roomId,
       title: roomInfo.title,
       isCreator: roomInfo.isCreator || false,
       isAuthorized: roomInfo.isAuthorized || roomInfo.isCreator || false,
