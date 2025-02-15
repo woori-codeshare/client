@@ -17,8 +17,8 @@ import { INITIAL_WIDTHS, PANEL_CONFIGS } from "@/constants/panel-config";
 export default function Home() {
   // 상태 관리
   const [code, setCode] = useState(INITIAL_CODE);
-  const [snapshots, setSnapshots] = useState([INITIAL_SNAPSHOT]);
-  const [currentVersion, setCurrentVersion] = useState(0);
+  const [snapshots, setSnapshots] = useState([]);
+  const [currentVersion, setCurrentVersion] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activePanel, setActivePanel] = useState(PANEL_CONFIGS.QUESTIONS.id);
   const [leftWidth, setLeftWidth] = useState(INITIAL_WIDTHS.LEFT);
@@ -76,8 +76,15 @@ export default function Home() {
    * 스냅샷 버전 변경 처리
    */
   const handleVersionChange = (index) => {
-    setCurrentVersion(index);
-    setCode(snapshots[index].code);
+    if (index === null) {
+      setCurrentVersion(null);
+      return;
+    }
+
+    if (snapshots[index]) {
+      setCode(snapshots[index].code);
+      setCurrentVersion(index);
+    }
   };
 
   return (
