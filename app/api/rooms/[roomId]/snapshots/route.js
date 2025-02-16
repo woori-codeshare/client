@@ -13,10 +13,10 @@ import { NextResponse } from "next/server";
  */
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { roomId } = params;
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const response = await fetch(`${API_URL}/api/v1/snapshots/${id}/`, {
+    const response = await fetch(`${API_URL}/api/v1/snapshots/${roomId}/`, {
       headers: {
         accept: "application/json;charset=UTF-8",
       },
@@ -26,16 +26,16 @@ export async function GET(request, { params }) {
 
     if (!response.ok) {
       return NextResponse.json(
-          { error: data.message || "스냅샷 조회에 실패했습니다." },
-          { status: response.status }
+        { error: data.message || "스냅샷 조회에 실패했습니다." },
+        { status: response.status }
       );
     }
 
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
-        { error: "서버 에러가 발생했습니다." },
-        { status: 500 }
+      { error: "서버 에러가 발생했습니다." },
+      { status: 500 }
     );
   }
 }

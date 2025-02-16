@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
  *
  * @param {Request} request - HTTP 요청 객체
  * @param {Object} params - URL 매개변수
- * @param {string} params.id - 방 UUID
+ * @param {string} params.roomId - 방 UUID
  * @returns {Promise<NextResponse>} JSON 응답
  *
  * @throws {Error} 비밀번호가 일치하지 않는 경우
@@ -17,13 +17,13 @@ import { NextResponse } from "next/server";
  */
 export async function POST(request, { params }) {
   try {
-    const { id } = params;
+    const { roomId } = params;
     const { searchParams } = new URL(request.url);
     const password = searchParams.get("password");
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     const response = await fetch(
-      `${API_URL}/api/v1/rooms/enter/${id}?password=${password}`,
+      `${API_URL}/api/v1/rooms/enter/${roomId}?password=${password}`,
       {
         method: "POST",
       }
