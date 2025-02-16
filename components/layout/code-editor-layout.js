@@ -24,6 +24,8 @@ import VotingPanel from "@/components/features/voting/voting-panel";
  * @param {Function} props.onVersionChange - 버전 변경 핸들러
  * @param {string} props.activePanel - 활성화된 패널 ID
  * @param {Function} props.onPanelChange - 패널 변경 핸들러
+ * @param {string} props.roomId - 방 ID
+ * @param {string|null} props.snapshotId - 현재 선택된 스냅샷 ID
  */
 export default function CodeEditorLayout({
   code,
@@ -42,7 +44,20 @@ export default function CodeEditorLayout({
   onVersionChange,
   activePanel,
   onPanelChange,
+  roomId,
+  snapshotId,
 }) {
+  const renderActivePanel = () => {
+    switch (activePanel) {
+      case "questions":
+        return <QuestionsPanel roomId={roomId} snapshotId={snapshotId} />;
+      case "voting":
+        return <VotingPanel />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="flex h-[calc(100vh-64px)]">
       {/* 좌측 사이드바 영역 */}
@@ -141,8 +156,8 @@ export default function CodeEditorLayout({
         {/* 패널 컨텐츠 */}
         <div
           className={`fixed right-12 top-16 bottom-0 bg-gray-900 border-l border-gray-800
-            transition-transform duration-200 ease-in-out flex
-            ${activePanel ? "translate-x-0" : "translate-x-full"}`}
+          transition-transform duration-200 ease-in-out flex
+          ${activePanel ? "translate-x-0" : "translate-x-full"}`}
           style={{ width: `${rightWidth}px` }}
         >
           <ResizeHandle
@@ -150,10 +165,7 @@ export default function CodeEditorLayout({
             direction="right"
             className="bg-gray-800"
           />
-          <div className="flex-1 p-4 h-full ml-1">
-            {activePanel === "questions" && <QuestionsPanel />}
-            {activePanel === "voting" && <VotingPanel />}
-          </div>
+          <div className="flex-1 p-4 h-full ml-1">{renderActivePanel()}</div>
         </div>
       </div>
     </div>

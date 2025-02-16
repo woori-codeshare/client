@@ -243,6 +243,10 @@ export default function CodeShareRoomPage() {
         snapshots={snapshots}
         currentVersion={currentVersion}
         onVersionChange={handleVersionChange}
+        roomId={id}
+        snapshotId={
+          currentVersion !== null ? snapshots[currentVersion].id : null
+        }
       />
 
       <RoomEnterModal

@@ -7,7 +7,7 @@ import { INITIAL_MESSAGES } from "@/constants/initial-data";
  * 질문과 답변을 관리하는 패널 컴포넌트
  * 학생들의 질문과 강사의 답변을 표시하고 관리하는 메인 컴포넌트
  */
-export default function QuestionsPanel() {
+export default function QuestionsPanel({ roomId, snapshotId }) {
   // 새로운 질문 입력을 관리하는 상태
   const [newQuestion, setNewQuestion] = useState("");
 
