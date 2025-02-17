@@ -310,6 +310,49 @@ export default function QuestionsPanel({
     }
   };
 
+  /**
+   * 댓글 삭제를 처리하는 함수
+   * @param {number} commentId - 삭제할 댓글 ID
+   */
+  const handleDelete = async (commentId) => {
+    try {
+      const response = await fetch(
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/questions/${commentId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showAlert(data.error || "댓글 삭제에 실패했습니다.", "error");
+        return;
+      }
+
+      // 메시지 목록에서 삭제
+      setMessages((prev) => prev.filter((msg) => msg.commentId !== commentId));
+
+      // 스냅샷 상태 업데이트
+      const updatedSnapshots = snapshots.map((snapshot) => {
+        if (snapshot.id === parseInt(snapshotId)) {
+          return {
+            ...snapshot,
+            comments: snapshot.comments.filter(
+              (comment) => comment.commentId !== commentId
+            ),
+          };
+        }
+        return snapshot;
+      });
+
+      onSnapshotsUpdate(updatedSnapshots);
+      showAlert(data.message || "댓글이 삭제되었습니다.", "success");
+    } catch (error) {
+      showAlert("서버 연결 오류가 발생했습니다.", "error");
+    }
+  };
+
   return (
     <div className="panel flex flex-col h-full">
       {/* 패널 헤더: 제목과 질문 개수 표시 */}
@@ -332,6 +375,7 @@ export default function QuestionsPanel({
               handleSubmit={handleSubmit}
               onEdit={handleEdit}
               editingId={editingId}
+              onDelete={handleDelete}
             />
             {message.replies.map((reply) => (
               <MessageItem
@@ -343,6 +387,7 @@ export default function QuestionsPanel({
                 handleSubmit={handleSubmit}
                 onEdit={handleEdit}
                 editingId={editingId}
+                onDelete={handleDelete}
               />
             ))}
           </div>
