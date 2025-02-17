@@ -73,7 +73,7 @@ export default function CodeEditor({
           <button
             onClick={handleCopy}
             className="p-2 text-gray-400 hover:text-blue-400 transition-colors rounded hover:bg-gray-800"
-            title={copied ? "복사됨" : "복사"}
+            title={copied ? "Copied" : "Copy"}
           >
             {copied ? <FaCheck size={14} /> : <FaCopy size={14} />}
           </button>
@@ -83,7 +83,7 @@ export default function CodeEditor({
             <button
               onClick={() => setIsModalOpen(true)}
               className="p-2 text-gray-400 hover:text-blue-400 transition-colors rounded hover:bg-gray-800"
-              title="스냅샷"
+              title="Snapshot"
             >
               <FaCamera size={14} />
             </button>
