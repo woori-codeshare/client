@@ -54,3 +54,39 @@ export async function PATCH(request, { params }) {
     );
   }
 }
+
+export async function DELETE(request, { params }) {
+  try {
+    const { commentId } = await params;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+    console.log("Deleting comment:", commentId);
+
+    const response = await fetch(`${API_URL}/api/v1/comments/${commentId}`, {
+      method: "DELETE",
+      cache: "no-store",
+    });
+
+    const data = await response.json();
+    console.log("Delete response:", data);
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: data.message || "댓글 삭제에 실패했습니다." },
+        { status: response.status }
+      );
+    }
+
+    return NextResponse.json({
+      code: data.code || "SUCCESS",
+      message: data.message || "댓글이 삭제되었습니다.",
+      data: data.data,
+    });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    return NextResponse.json(
+      { error: "서버 에러가 발생했습니다." },
+      { status: 500 }
+    );
+  }
+}
