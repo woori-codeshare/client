@@ -26,6 +26,7 @@ import VotingPanel from "@/components/features/voting/voting-panel";
  * @param {Function} props.onPanelChange - 패널 변경 핸들러
  * @param {string} props.roomId - 방 ID
  * @param {string|null} props.snapshotId - 현재 선택된 스냅샷 ID
+ * @param {Function} props.onSnapshotsUpdate - 스냅샷 업데이트 핸들러
  */
 export default function CodeEditorLayout({
   code,
@@ -46,11 +47,19 @@ export default function CodeEditorLayout({
   onPanelChange,
   roomId,
   snapshotId,
+  onSnapshotsUpdate,
 }) {
   const renderActivePanel = () => {
     switch (activePanel) {
       case "questions":
-        return <QuestionsPanel roomId={roomId} snapshotId={snapshotId} />;
+        return (
+          <QuestionsPanel
+            roomId={roomId}
+            snapshotId={snapshotId}
+            snapshots={snapshots}
+            onSnapshotsUpdate={onSnapshotsUpdate}
+          />
+        );
       case "voting":
         return <VotingPanel />;
       default:

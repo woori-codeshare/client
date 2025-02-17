@@ -8,12 +8,12 @@ import {
 import { formatRelativeTime } from "@/utils/formatters";
 
 /**
- * 질문/답변 메시지 아이템 컴포넌트
- * @param {Object} message - 메시지 데이터 객체
- * @param {boolean} isReply - 답글 여부
- * @param {Function} onReply - 답글 작성 시 호출되는 함수
+ * 개별 질문/답변 메시지를 표시하는 컴포넌트
+ * @param {Object} message - 표시할 메시지 데이터
+ * @param {boolean} isReply - 답글 여부 (true: 답글, false: 원글)
+ * @param {Function} onReply - 답글 작성 이벤트 핸들러
  * @param {Object} replyingTo - 현재 답글 작성 중인 메시지 정보
- * @param {Function} handleSubmit - 답글 제출 시 호출되는 함수
+ * @param {Function} handleSubmit - 답글 제출 이벤트 핸들러
  */
 export default function MessageItem({
   message,
@@ -22,16 +22,17 @@ export default function MessageItem({
   replyingTo,
   handleSubmit,
 }) {
-  // 상대적 시간 표시를 위한 상태
+  // 상대적 시간 표시 상태 (예: "5분 전")
   const [formattedTime, setFormattedTime] = useState("");
 
-  // 시간 업데이트 로직
+  // 시간 형식 업데이트 함수
   const updateTime = useCallback(() => {
-    if (!message?.timestamp) return;
-    setFormattedTime(formatRelativeTime(message.timestamp));
-  }, [message?.timestamp]);
+    if (!message?.createdAt) return;
+    const timestamp = new Date(message.createdAt).getTime();
+    setFormattedTime(formatRelativeTime(timestamp));
+  }, [message?.createdAt]);
 
-  // 30초마다 시간 업데이트
+  // 주기적으로 시간 형식 업데이트 (30초 간격)
   useEffect(() => {
     updateTime();
     const timer = setInterval(updateTime, 30000);
@@ -48,27 +49,25 @@ export default function MessageItem({
 
       {/* 메시지 내용 영역 */}
       <div className="flex-1">
-        {/* 메시지 텍스트 박스 (강사일 경우 파란색 배경) */}
+        {/* 메시지 텍스트 박스 */}
         <div
           className={`p-4 rounded-lg border ${
-            message.user.isInstructor
+            message.solved
               ? "bg-blue-500/10 border-blue-500/20"
               : "bg-gray-700/30 border-gray-700/50"
           }`}
         >
-          <p className="text-sm">{message.text}</p>
+          <p className="text-sm">{message.content}</p>
         </div>
 
-        {/* 메시지 메타 정보 (시간, 강사 표시, 답글 버튼) */}
+        {/* 메시지 메타 정보 (시간, 답글 버튼) */}
         <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
           <FaRegClock size={10} />
           <span>{formattedTime}</span>
-          {message.user.isInstructor && (
-            <span className="text-blue-400">Instructor</span>
-          )}
+          {message.solved && <span className="text-blue-400">Solved</span>}
           {!isReply && (
             <button
-              onClick={() => onReply(message.id)}
+              onClick={() => onReply(message.commentId)}
               className="ml-2 text-gray-400 hover:text-blue-400 flex items-center gap-1"
             >
               <FaReply size={10} />
@@ -78,16 +77,19 @@ export default function MessageItem({
         </div>
 
         {/* 답글 작성 폼 (답글 작성 중일 때만 표시) */}
-        {replyingTo?.id === message.id && (
+        {replyingTo?.commentId === message.commentId && (
           <form
-            onSubmit={(e) => handleSubmit(e, message.id)}
+            onSubmit={(e) => handleSubmit(e, message.commentId)}
             className="mt-2 flex gap-2"
           >
             <input
               type="text"
-              value={replyingTo.text}
+              value={replyingTo?.content ?? ""}
               onChange={(e) =>
-                onReply({ id: message.id, text: e.target.value })
+                onReply({
+                  commentId: message.commentId,
+                  content: e.target.value,
+                })
               }
               placeholder="Write a reply..."
               className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
@@ -96,7 +98,7 @@ export default function MessageItem({
             <button
               type="submit"
               className="p-2 text-blue-400 hover:text-blue-300 disabled:text-gray-600"
-              disabled={!replyingTo.text?.trim()}
+              disabled={!replyingTo?.content?.trim()}
             >
               <FaPaperPlane size={16} />
             </button>

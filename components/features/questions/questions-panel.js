@@ -1,24 +1,149 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FaQuestion, FaPaperPlane } from "react-icons/fa";
 import MessageItem from "./message-item";
-import { INITIAL_MESSAGES } from "@/constants/initial-data";
+import { useAlert } from "@/contexts/alert-context";
 
 /**
  * 질문과 답변을 관리하는 패널 컴포넌트
- * 학생들의 질문과 강사의 답변을 표시하고 관리하는 메인 컴포넌트
+ * @param {string} roomId - 현재 룸의 고유 식별자
+ * @param {string} snapshotId - 현재 스냅샷의 고유 식별자
+ * @param {Array} snapshots - 전체 스냅샷 목록
+ * @param {Function} onSnapshotsUpdate - 스냅샷 업데이트 핸들러
  */
-export default function QuestionsPanel({ roomId, snapshotId }) {
-  // 새로운 질문 입력을 관리하는 상태
+export default function QuestionsPanel({
+  roomId,
+  snapshotId,
+  snapshots,
+  onSnapshotsUpdate,
+}) {
+  // 사용자 입력 질문을 관리하는 상태
   const [newQuestion, setNewQuestion] = useState("");
 
-  // 현재 답변 작성 중인 질문을 추적하는 상태
-  // null이면 답변 작성 중이 아님
-  // { id: number, text: string }와 같은 형태로 저장
+  // 답변 작성 중인 질문 정보를 관리하는 상태
+  // { commentId: number, content: string } 형태로 저장
   const [replyingTo, setReplyingTo] = useState(null);
 
-  // 전체 메시지(질문/답변) 목록을 관리하는 상태
-  // INITIAL_MESSAGES는 초기 더미 데이터 (실제 환경에서는 API 호출로 대체)
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+  // 전체 질문/답변 목록을 관리하는 상태
+  const [messages, setMessages] = useState([]);
+
+  // 알림 컨텍스트 훅
+  const { showAlert } = useAlert();
+
+  /**
+   * 댓글들을 계층 구조로 정리하는 함수
+   * 평면적인 댓글 배열을 부모-자식 관계가 있는 트리 구조로 변환합니다.
+   *
+   * @param {Array} comments - 정리할 댓글 목록
+   * @returns {Array} - 계층 구조로 정리된 댓글 트리
+   *
+   * 동작 과정:
+   * 1. 부모 댓글과 자식 댓글을 분류
+   *    - parentCommentId가 0인 댓글은 부모 댓글로 분류
+   *    - parentCommentId가 있는 댓글은 해당 ID를 키로 하여 Map에 저장
+   *
+   * 2. 부모 댓글에 자식 댓글 연결
+   *    - 각 부모 댓글의 commentId를 키로 하여 Map에서 자식 댓글들을 찾아 연결
+   *    - 자식 댓글이 없는 경우 빈 배열로 처리
+   *
+   * 입력 예시:
+   * [
+   *   { commentId: 1, content: "질문1", parentCommentId: 0 },
+   *   { commentId: 2, content: "답변1", parentCommentId: 1 },
+   *   { commentId: 3, content: "질문2", parentCommentId: 0 }
+   * ]
+   *
+   * 출력 예시:
+   * [
+   *   {
+   *     commentId: 1,
+   *     content: "질문1",
+   *     parentCommentId: 0,
+   *     replies: [
+   *       { commentId: 2, content: "답변1", parentCommentId: 1 }
+   *     ]
+   *   },
+   *   {
+   *     commentId: 3,
+   *     content: "질문2",
+   *     parentCommentId: 0,
+   *     replies: []
+   *   }
+   * ]
+   */
+  const organizeComments = (comments) => {
+    const parentComments = []; // 부모 댓글 목록
+    const childComments = new Map(); // 부모-자식 댓글 매핑
+
+    // 부모-자식 댓글 분류
+    comments.forEach((comment) => {
+      if (comment.parentCommentId === 0) {
+        parentComments.push(comment);
+      } else {
+        if (!childComments.has(comment.parentCommentId)) {
+          childComments.set(comment.parentCommentId, []);
+        }
+        childComments.get(comment.parentCommentId).push(comment);
+      }
+    });
+
+    // 부모 댓글에 자식 댓글 연결
+    return parentComments.map((parent) => ({
+      ...parent,
+      replies: childComments.get(parent.commentId) || [],
+    }));
+  };
+
+  /**
+   * 현재 스냅샷의 댓글들을 찾아 계층 구조로 변환
+   */
+  const getCurrentSnapshotComments = useCallback(() => {
+    if (!snapshotId || !snapshots) return [];
+
+    const currentSnapshot = snapshots.find(
+      (snapshot) => snapshot.id === parseInt(snapshotId)
+    );
+
+    if (!currentSnapshot?.comments) return [];
+
+    return organizeComments(
+      currentSnapshot.comments.map((comment) => ({
+        ...comment,
+        parentCommentId:
+          comment.parentCommentId === null ? 0 : comment.parentCommentId,
+      }))
+    );
+  }, [snapshotId, snapshots]);
+
+  // 스냅샷이 변경될 때마다 메시지 목록 업데이트
+  useEffect(() => {
+    const organizedMessages = getCurrentSnapshotComments();
+    setMessages(organizedMessages);
+  }, [getCurrentSnapshotComments]);
+
+  /**
+   * 스냅샷의 댓글 목록을 업데이트하는 함수
+   * @param {Object} newComment - 새로 추가된 댓글
+   */
+  const updateSnapshotComments = useCallback(
+    (newComment) => {
+      if (!snapshots || !snapshotId) return;
+
+      // 스냅샷 목록에서 현재 스냅샷을 찾아 댓글 추가
+      const updatedSnapshots = snapshots.map((snapshot) => {
+        if (snapshot.id === parseInt(snapshotId)) {
+          return {
+            ...snapshot,
+            comments: [...(snapshot.comments || []), newComment],
+          };
+        }
+        return snapshot;
+      });
+
+      // 상위 컴포넌트의 스냅샷 상태 업데이트
+      onSnapshotsUpdate?.(updatedSnapshots);
+    },
+    [snapshotId, snapshots, onSnapshotsUpdate]
+  );
 
   /**
    * 답변 작성 모드를 토글하는 함수
@@ -27,51 +152,85 @@ export default function QuestionsPanel({ roomId, snapshotId }) {
    *   - Object: 답변 내용 업데이트 시 ({ id, text })
    */
   const handleReply = (messageData) => {
+    // 답글 작성 시 데이터 구조 통일
     const isInitialReply = typeof messageData === "number";
-    setReplyingTo(isInitialReply ? { id: messageData, text: "" } : messageData);
+    setReplyingTo(
+      isInitialReply
+        ? { commentId: messageData, content: "" } // 초기 답글 시작
+        : messageData // 답글 내용 업데이트
+    );
   };
-
-  /**
-   * 새로운 메시지(질문/답변) 객체를 생성하는 헬퍼 함수
-   * @param {string} text - 메시지 내용
-   * @returns {Object} 생성된 메시지 객체
-   */
-  const createNewMessage = (text) => ({
-    id: Date.now(), // 임시 ID 생성 (실제는 서버에서 생성)
-    text: text.trim(),
-    timestamp: new Date(),
-    user: { name: "Student" }, // 실제는 인증된 사용자 정보 사용
-    replies: [], // 답변 배열 초기화
-  });
 
   /**
    * 질문 또는 답변 제출을 처리하는 함수
    * @param {Event} e - 폼 제출 이벤트 객체
    * @param {number|null} parentId - 답변의 경우 부모 질문 ID, 새 질문은 null
    */
-  const handleSubmit = (e, parentId = null) => {
+  const handleSubmit = async (e, parentId = null) => {
     e.preventDefault();
 
-    // 답변인지 새 질문인지에 따라 다른 텍스트 참조
-    const text = parentId ? replyingTo?.text : newQuestion;
-    if (!text?.trim()) return; // 빈 내용 제출 방지
+    if (!snapshotId) {
+      showAlert("Snapshot ID is required", "error");
+      return;
+    }
 
-    const newMessage = createNewMessage(text);
+    const content = parentId ? replyingTo?.content : newQuestion;
+    if (!content?.trim()) return;
 
-    if (parentId) {
-      // 기존 질문에 대한 답변 추가
-      setMessages(
-        messages.map((msg) =>
-          msg.id === parentId
-            ? { ...msg, replies: [...msg.replies, newMessage] }
-            : msg
-        )
+    try {
+      const requestBody = {
+        snapshotId: parseInt(snapshotId),
+        content: content.trim(),
+        ...(parentId ? { parentCommentId: parentId } : {}),
+      };
+
+      const response = await fetch(
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/questions`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
       );
-      setReplyingTo(null); // 답변 작성 모드 종료
-    } else {
-      // 새로운 질문 추가
-      setMessages([...messages, newMessage]);
-      setNewQuestion(""); // 입력 폼 초기화
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showAlert(data.message || "Failed to create comment", "error");
+        return;
+      }
+
+      const newMessage = {
+        commentId: data.data.commentId,
+        content: data.data.content,
+        createdAt: new Date().toISOString(),
+        solved: false,
+        parentCommentId: parentId === null ? 0 : parentId,
+        replies: [],
+      };
+
+      if (parentId) {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.commentId === parentId
+              ? { ...msg, replies: [...msg.replies, newMessage] }
+              : msg
+          )
+        );
+        setReplyingTo(null);
+      } else {
+        setMessages((prev) => [...prev, newMessage]);
+        setNewQuestion("");
+      }
+
+      // 스냅샷의 comments 배열 업데이트
+      updateSnapshotComments(newMessage);
+
+      showAlert(data.message || "Comment created successfully", "success");
+    } catch (error) {
+      showAlert("Server connection error", "error");
     }
   };
 
@@ -89,7 +248,7 @@ export default function QuestionsPanel({ roomId, snapshotId }) {
       {/* 메시지 목록: 질문과 답변을 계층 구조로 표시 */}
       <div className="flex-1 space-y-4 mt-4 overflow-y-auto">
         {messages.map((message) => (
-          <div key={message.id} className="space-y-3">
+          <div key={message.commentId} className="space-y-3">
             {/* 질문 메시지 컴포넌트 */}
             <MessageItem
               message={message}
@@ -100,7 +259,7 @@ export default function QuestionsPanel({ roomId, snapshotId }) {
             {/* 해당 질문에 대한 답변 목록 */}
             {message.replies.map((reply) => (
               <MessageItem
-                key={reply.id}
+                key={reply.commentId}
                 message={reply}
                 isReply={true}
                 onReply={handleReply}

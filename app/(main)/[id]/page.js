@@ -227,6 +227,13 @@ export default function CodeShareRoomPage() {
     }
   };
 
+  /**
+   * 스냅샷 목록 업데이트 핸들러
+   */
+  const handleSnapshotsUpdate = useCallback((updatedSnapshots) => {
+    setSnapshots(updatedSnapshots);
+  }, []);
+
   return (
     <>
       <CodeEditorLayout
@@ -244,11 +251,12 @@ export default function CodeShareRoomPage() {
         activePanel={activePanel}
         onPanelChange={togglePanel}
         snapshots={snapshots}
+        onSnapshotsUpdate={handleSnapshotsUpdate}
         currentVersion={currentVersion}
         onVersionChange={handleVersionChange}
         roomId={id}
         snapshotId={
-          currentVersion !== null ? snapshots[currentVersion].id : null
+          currentVersion !== null ? snapshots[currentVersion]?.id : null
         }
       />
 
