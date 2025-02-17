@@ -29,6 +29,8 @@ export default function QuestionsPanel({
   // 알림 컨텍스트 훅
   const { showAlert } = useAlert();
 
+  const [editingId, setEditingId] = useState(null);
+
   /**
    * 댓글들을 계층 구조로 정리하는 함수
    * 평면적인 댓글 배열을 부모-자식 관계가 있는 트리 구조로 변환합니다.
@@ -234,6 +236,80 @@ export default function QuestionsPanel({
     }
   };
 
+  /**
+   * 댓글 수정을 처리하는 함수
+   * @param {number} commentId - 수정할 댓글 ID
+   * @param {string} content - 수정할 내용
+   */
+  const handleEdit = async (commentId, content) => {
+    // 수정 모드 취소
+    if (!commentId) {
+      setEditingId(null);
+      return;
+    }
+
+    // 수정 모드 시작
+    if (!content) {
+      setEditingId(commentId);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/questions/${commentId}`,
+        {
+          method: "PATCH", // PUT 에서 PATCH로 변경
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showAlert(data.error || "댓글 수정에 실패했습니다.", "error");
+        return;
+      }
+
+      // 로컬 상태와 스냅샷 상태 업데이트 (API 응답 데이터 사용)
+      const updatedComment = {
+        commentId: data.data.commentId,
+        content: data.data.content,
+        updatedAt: data.data.updatedAt,
+      };
+
+      // 메시지 목록 업데이트
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.commentId === commentId ? { ...msg, ...updatedComment } : msg
+        )
+      );
+
+      // 스냅샷 상태 업데이트
+      const updatedSnapshots = snapshots.map((snapshot) => {
+        if (snapshot.id === parseInt(snapshotId)) {
+          return {
+            ...snapshot,
+            comments: snapshot.comments.map((comment) =>
+              comment.commentId === commentId
+                ? { ...comment, ...updatedComment }
+                : comment
+            ),
+          };
+        }
+        return snapshot;
+      });
+
+      onSnapshotsUpdate(updatedSnapshots);
+      setEditingId(null);
+      showAlert(data.message || "댓글이 수정되었습니다.", "success");
+    } catch (error) {
+      showAlert("서버 연결 오류가 발생했습니다.", "error");
+    }
+  };
+
   return (
     <div className="panel flex flex-col h-full">
       {/* 패널 헤더: 제목과 질문 개수 표시 */}
@@ -249,14 +325,14 @@ export default function QuestionsPanel({
       <div className="flex-1 space-y-4 mt-4 overflow-y-auto">
         {messages.map((message) => (
           <div key={message.commentId} className="space-y-3">
-            {/* 질문 메시지 컴포넌트 */}
             <MessageItem
               message={message}
               onReply={handleReply}
               replyingTo={replyingTo}
               handleSubmit={handleSubmit}
+              onEdit={handleEdit}
+              editingId={editingId}
             />
-            {/* 해당 질문에 대한 답변 목록 */}
             {message.replies.map((reply) => (
               <MessageItem
                 key={reply.commentId}
@@ -265,6 +341,8 @@ export default function QuestionsPanel({
                 onReply={handleReply}
                 replyingTo={replyingTo}
                 handleSubmit={handleSubmit}
+                onEdit={handleEdit}
+                editingId={editingId}
               />
             ))}
           </div>

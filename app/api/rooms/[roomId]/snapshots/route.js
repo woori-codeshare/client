@@ -13,7 +13,7 @@ import { NextResponse } from "next/server";
  */
 export async function GET(request, { params }) {
   try {
-    const { roomId } = params;
+    const { roomId } = await params;
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(`${API_URL}/api/v1/snapshots/${roomId}/`, {
