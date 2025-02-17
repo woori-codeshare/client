@@ -187,7 +187,7 @@ export default function QuestionsPanel({
       };
 
       const response = await fetch(
-        `/api/rooms/${roomId}/snapshots/${snapshotId}/questions`,
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/comments`,
         {
           method: "POST",
           headers: {
@@ -256,7 +256,7 @@ export default function QuestionsPanel({
 
     try {
       const response = await fetch(
-        `/api/rooms/${roomId}/snapshots/${snapshotId}/questions/${commentId}`,
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/comments/${commentId}`,
         {
           method: "PATCH", // PUT 에서 PATCH로 변경
           headers: {
@@ -317,7 +317,7 @@ export default function QuestionsPanel({
   const handleDelete = async (commentId) => {
     try {
       const response = await fetch(
-        `/api/rooms/${roomId}/snapshots/${snapshotId}/questions/${commentId}`,
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/comments/${commentId}`,
         {
           method: "DELETE",
         }
@@ -361,7 +361,7 @@ export default function QuestionsPanel({
   const handleToggleSolved = async (commentId, solved) => {
     try {
       const response = await fetch(
-        `/api/rooms/${roomId}/snapshots/${snapshotId}/questions/${commentId}/resolve`,
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/comments/${commentId}/resolve`,
         {
           method: "PATCH",
           headers: {

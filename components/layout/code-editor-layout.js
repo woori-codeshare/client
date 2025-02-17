@@ -51,7 +51,7 @@ export default function CodeEditorLayout({
 }) {
   const renderActivePanel = () => {
     switch (activePanel) {
-      case "questions":
+      case "comments":
         return (
           <QuestionsPanel
             roomId={roomId}
@@ -139,9 +139,9 @@ export default function CodeEditorLayout({
         {/* 우측 고정 영역 */}
         <div className="fixed right-0 top-16 bottom-0 w-12 bg-gray-900 border-l border-gray-800 flex flex-col items-center py-4 z-20">
           <button
-            onClick={() => onPanelChange("questions")}
+            onClick={() => onPanelChange("comments")}
             className={`p-3 mb-2 rounded-lg transition-colors ${
-              activePanel === "questions"
+              activePanel === "comments"
                 ? "bg-blue-500/20 text-blue-400"
                 : "text-gray-400 hover:text-gray-300"
             } ${

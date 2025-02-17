@@ -1,7 +1,7 @@
 export const PANEL_CONFIGS = {
   // 질문 및 답변을 관리하는 패널
   QUESTIONS: {
-    id: "questions",
+    id: "comments",
     icon: "FaQuestion",
     title: "Questions",
   },
