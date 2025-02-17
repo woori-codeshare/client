@@ -135,8 +135,15 @@ export default function CodeEditorLayout({
               activePanel === "questions"
                 ? "bg-blue-500/20 text-blue-400"
                 : "text-gray-400 hover:text-gray-300"
+            } ${
+              currentVersion === null ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            title="Questions"
+            title={
+              currentVersion === null
+                ? "Only available in snapshot mode"
+                : "Questions"
+            }
+            disabled={currentVersion === null}
           >
             <FaQuestion size={18} />
           </button>
@@ -146,8 +153,15 @@ export default function CodeEditorLayout({
               activePanel === "voting"
                 ? "bg-blue-500/20 text-blue-400"
                 : "text-gray-400 hover:text-gray-300"
+            } ${
+              currentVersion === null ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            title="Voting"
+            title={
+              currentVersion === null
+                ? "Only available in snapshot mode"
+                : "Voting"
+            }
+            disabled={currentVersion === null}
           >
             <FaVoteYea size={18} />
           </button>
@@ -157,7 +171,11 @@ export default function CodeEditorLayout({
         <div
           className={`fixed right-12 top-16 bottom-0 bg-gray-900 border-l border-gray-800
           transition-transform duration-200 ease-in-out flex
-          ${activePanel ? "translate-x-0" : "translate-x-full"}`}
+          ${
+            activePanel && currentVersion !== null
+              ? "translate-x-0"
+              : "translate-x-full"
+          }`}
           style={{ width: `${rightWidth}px` }}
         >
           <ResizeHandle

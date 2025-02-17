@@ -130,6 +130,9 @@ export default function CodeShareRoomPage() {
    * 우측 패널(질문, 투표) 토글 처리
    */
   const togglePanel = (panelName) => {
+    // current session(currentVersion이 null)인 경우 패널을 열지 않음
+    if (currentVersion === null) return;
+
     setActivePanel(activePanel === panelName ? null : panelName);
   };
 
