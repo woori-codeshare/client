@@ -6,6 +6,7 @@ import {
   FaPaperPlane,
   FaEdit,
   FaTrash,
+  FaCheck,
 } from "react-icons/fa";
 import { formatRelativeTime } from "@/utils/formatters";
 
@@ -19,6 +20,7 @@ import { formatRelativeTime } from "@/utils/formatters";
  * @param {Function} onEdit - 수정 핸들러
  * @param {string} editingId - 현재 수정 중인 메시지 ID
  * @param {Function} onDelete - 삭제 핸들러
+ * @param {Function} onToggleSolved - 해결 상태 토글 핸들러
  */
 export default function MessageItem({
   message,
@@ -29,6 +31,7 @@ export default function MessageItem({
   onEdit, // 새로운 prop: 수정 핸들러
   editingId, // 새로운 prop: 현재 수정 중인 메시지 ID
   onDelete, // 새로운 prop 추가
+  onToggleSolved, // 새로운 prop 추가
 }) {
   // 상대적 시간 표시 상태 (예: "5분 전")
   const [formattedTime, setFormattedTime] = useState("");
@@ -120,28 +123,45 @@ export default function MessageItem({
         <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
           <FaRegClock size={10} />
           <span>{formattedTime}</span>
-          {message.solved && <span className="text-blue-400">Solved</span>}
           <div className="flex items-center gap-2 ml-auto">
-            {canEdit && (
+            {!isReply && (
               <>
                 <button
-                  onClick={() => onEdit(message.commentId)}
-                  className="text-gray-400 hover:text-blue-400 flex items-center gap-1"
+                  onClick={() =>
+                    onToggleSolved(message.commentId, !message.solved)
+                  }
+                  className={`flex items-center gap-1 ${
+                    message.solved
+                      ? "text-green-400"
+                      : "text-gray-400 hover:text-green-400"
+                  }`}
+                  title={message.solved ? "질문 해결 취소" : "질문 해결 완료"}
                 >
-                  <FaEdit size={10} />
-                  <span>수정</span>
+                  <FaCheck size={10} />
+                  <span>{message.solved ? "해결됨" : "해결"}</span>
                 </button>
-                <button
-                  onClick={() => {
-                    if (window.confirm("정말 삭제하시겠습니까?")) {
-                      onDelete(message.commentId);
-                    }
-                  }}
-                  className="text-gray-400 hover:text-red-400 flex items-center gap-1"
-                >
-                  <FaTrash size={10} />
-                  <span>삭제</span>
-                </button>
+                {canEdit && (
+                  <>
+                    <button
+                      onClick={() => onEdit(message.commentId)}
+                      className="text-gray-400 hover:text-blue-400 flex items-center gap-1"
+                    >
+                      <FaEdit size={10} />
+                      <span>수정</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (window.confirm("정말 삭제하시겠습니까?")) {
+                          onDelete(message.commentId);
+                        }
+                      }}
+                      className="text-gray-400 hover:text-red-400 flex items-center gap-1"
+                    >
+                      <FaTrash size={10} />
+                      <span>삭제</span>
+                    </button>
+                  </>
+                )}
               </>
             )}
             {!isReply && (

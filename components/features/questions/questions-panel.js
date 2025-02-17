@@ -353,6 +353,67 @@ export default function QuestionsPanel({
     }
   };
 
+  /**
+   * 질문 해결 여부를 토글하는 함수
+   * @param {number} commentId - 질문 ID
+   * @param {boolean} solved - 해결 여부
+   */
+  const handleToggleSolved = async (commentId, solved) => {
+    try {
+      const response = await fetch(
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/questions/${commentId}/resolve`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ solved }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showAlert(data.error || "해결 상태 변경에 실패했습니다.", "error");
+        return;
+      }
+
+      // 메시지 목록 업데이트
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.commentId === commentId
+            ? { ...msg, solved: data.data.solved }
+            : msg
+        )
+      );
+
+      // 스냅샷 상태 업데이트
+      const updatedSnapshots = snapshots.map((snapshot) => {
+        if (snapshot.id === parseInt(snapshotId)) {
+          return {
+            ...snapshot,
+            comments: snapshot.comments.map((comment) =>
+              comment.commentId === commentId
+                ? { ...comment, solved: data.data.solved }
+                : comment
+            ),
+          };
+        }
+        return snapshot;
+      });
+
+      onSnapshotsUpdate(updatedSnapshots);
+      showAlert(
+        solved
+          ? "질문이 해결 완료되었습니다."
+          : "질문이 미해결로 변경되었습니다.",
+        "success"
+      );
+    } catch (error) {
+      showAlert("서버 연결 오류가 발생했습니다.", "error");
+    }
+  };
+
   return (
     <div className="panel flex flex-col h-full">
       {/* 패널 헤더: 제목과 질문 개수 표시 */}
@@ -376,6 +437,7 @@ export default function QuestionsPanel({
               onEdit={handleEdit}
               editingId={editingId}
               onDelete={handleDelete}
+              onToggleSolved={handleToggleSolved}
             />
             {message.replies.map((reply) => (
               <MessageItem
@@ -388,6 +450,7 @@ export default function QuestionsPanel({
                 onEdit={handleEdit}
                 editingId={editingId}
                 onDelete={handleDelete}
+                onToggleSolved={handleToggleSolved}
               />
             ))}
           </div>
