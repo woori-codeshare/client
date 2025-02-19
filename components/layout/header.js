@@ -10,7 +10,7 @@ export default function Header() {
   return (
     <header className="border-b border-gray-800 p-4">
       <div className="flex justify-between items-center pl-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Image
             src="/img/logo.png"
             alt="Woori CodeShare Logo"
