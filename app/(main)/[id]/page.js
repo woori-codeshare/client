@@ -73,7 +73,6 @@ export default function CodeShareRoomPage() {
             title: snapshot.title,
             description: snapshot.description,
             code: snapshot.code,
-            comments: snapshot.comments,
           }))
           .sort((a, b) => b.timestamp - a.timestamp); // 날짜 기준 내림차순 정렬
 

@@ -1,25 +1,30 @@
 import { NextResponse } from "next/server";
 
-export async function POST(request) {
+export async function POST(request, { params }) {
   try {
+    const { snapshotId } = params;
     const body = await request.json();
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-    const requestBody = {
-      snapshotId: body.snapshotId,
+    console.log("Creating comment:", {
+      snapshotId,
       content: body.content,
-      ...(body.parentCommentId
-        ? { parentCommentId: body.parentCommentId }
-        : {}), // 답글인 경우 부모 댓글 ID 추가
-    };
-
-    const response = await fetch(`${API_URL}/api/v1/comments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
+      parentCommentId: body.parentCommentId || null, // 0 대신 null 사용
     });
+
+    const response = await fetch(
+      `${API_URL}/api/v1/comments/${snapshotId}/new`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: body.content,
+          parentCommentId: body.parentCommentId || null, // 0 대신 null 사용
+        }),
+      }
+    );
 
     const data = await response.json();
 
@@ -40,6 +45,39 @@ export async function POST(request) {
       data: data.data,
     });
   } catch (error) {
+    return NextResponse.json(
+      { error: "서버 에러가 발생했습니다." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request, { params }) {
+  try {
+    const { snapshotId } = params;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+    console.log("Fetching comments for snapshot:", snapshotId);
+    const response = await fetch(`${API_URL}/api/v1/comments/${snapshotId}`, {
+      headers: {
+        accept: "application/json",
+      },
+    });
+
+    console.log("Response status:", response.status);
+    const data = await response.json();
+    console.log("Comments data:", data);
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: data.message || "댓글 조회에 실패했습니다." },
+        { status: response.status }
+      );
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Comments fetch error:", error);
     return NextResponse.json(
       { error: "서버 에러가 발생했습니다." },
       { status: 500 }

@@ -54,7 +54,15 @@ export async function POST(request) {
     const body = await request.json();
     const { roomId, title, description, code } = body;
 
+    console.log("Request body:", {
+      roomId,
+      title,
+      description,
+      codeLength: code?.length,
+    });
+
     if (!roomId) {
+      console.log("Missing roomId");
       return NextResponse.json(
         { error: "roomId가 필요합니다." },
         { status: 400 }
@@ -62,18 +70,34 @@ export async function POST(request) {
     }
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const response = await fetch(`${API_URL}/api/v1/snapshots/`, {
+    console.log("API URL:", `${API_URL}/api/v1/snapshots/${roomId}`);
+
+    const requestBody = { title, description, code };
+    console.log("API Request body:", {
+      ...requestBody,
+      codeLength: code?.length,
+    });
+
+    const response = await fetch(`${API_URL}/api/v1/snapshots/${roomId}`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json;charset=UTF-8",
-        accept: "application/json;charset=UTF-8",
+        "Content-Type": "application/json",
+        accept: "application/json",
       },
-      body: JSON.stringify({ roomId, title, description, code }),
+      body: JSON.stringify(requestBody),
     });
 
     const data = await response.json();
+    console.log("API Response:", {
+      status: response.status,
+      data,
+    });
 
     if (!response.ok) {
+      console.error("API Error:", {
+        status: response.status,
+        data,
+      });
       return NextResponse.json(
         { error: data.message || "스냅샷 생성에 실패했습니다." },
         { status: response.status }
@@ -82,6 +106,7 @@ export async function POST(request) {
 
     return NextResponse.json(data);
   } catch (error) {
+    console.error("Server Error:", error);
     return NextResponse.json(
       { error: "서버 에러가 발생했습니다." },
       { status: 500 }

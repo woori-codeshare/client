@@ -95,32 +95,46 @@ export default function QuestionsPanel({
     }));
   };
 
-  /**
-   * 현재 스냅샷의 댓글들을 찾아 계층 구조로 변환
-   */
-  const getCurrentSnapshotComments = useCallback(() => {
-    if (!snapshotId || !snapshots) return [];
+  // 현재 스냅샷의 댓글 목록을 조회하는 함수
+  const fetchComments = useCallback(async () => {
+    if (!snapshotId) return;
 
-    const currentSnapshot = snapshots.find(
-      (snapshot) => snapshot.id === parseInt(snapshotId)
-    );
+    try {
+      console.log("Fetching comments for:", { roomId, snapshotId });
 
-    if (!currentSnapshot?.comments) return [];
+      const response = await fetch(
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/comments`
+      );
 
-    return organizeComments(
-      currentSnapshot.comments.map((comment) => ({
-        ...comment,
-        parentCommentId:
-          comment.parentCommentId === null ? 0 : comment.parentCommentId,
-      }))
-    );
-  }, [snapshotId, snapshots]);
+      console.log("Response status:", response.status);
+      const data = await response.json();
+      console.log("Comments API response:", data);
 
-  // 스냅샷이 변경될 때마다 메시지 목록 업데이트
+      if (!response.ok) {
+        console.error("Comments API error:", data);
+        showAlert(data.error || "댓글 조회에 실패했습니다.", "error");
+        return;
+      }
+
+      const organizedMessages = organizeComments(
+        data.data.map((comment) => ({
+          ...comment,
+          parentCommentId:
+            comment.parentCommentId === null ? 0 : comment.parentCommentId,
+        }))
+      );
+      console.log("Organized messages:", organizedMessages);
+      setMessages(organizedMessages);
+    } catch (error) {
+      console.error("Comments fetch error:", error);
+      showAlert("댓글 조회 중 오류가 발생했습니다.", "error");
+    }
+  }, [roomId, snapshotId, showAlert]);
+
+  // 스냅샷이 변경될 때마다 댓글 목록 조회
   useEffect(() => {
-    const organizedMessages = getCurrentSnapshotComments();
-    setMessages(organizedMessages);
-  }, [getCurrentSnapshotComments]);
+    fetchComments();
+  }, [fetchComments]);
 
   /**
    * 스냅샷의 댓글 목록을 업데이트하는 함수
@@ -258,7 +272,7 @@ export default function QuestionsPanel({
       const response = await fetch(
         `/api/rooms/${roomId}/snapshots/${snapshotId}/comments/${commentId}`,
         {
-          method: "PATCH", // PUT 에서 PATCH로 변경
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
@@ -267,45 +281,54 @@ export default function QuestionsPanel({
       );
 
       const data = await response.json();
+      console.log("Edit response:", data);
 
       if (!response.ok) {
-        showAlert(data.error || "댓글 수정에 실패했습니다.", "error");
+        showAlert(data.message || "댓글 수정에 실패했습니다.", "error");
         return;
       }
 
-      // 로컬 상태와 스냅샷 상태 업데이트 (API 응답 데이터 사용)
+      // 응답이 성공적인 경우 (200)
       const updatedComment = {
         commentId: data.data.commentId,
         content: data.data.content,
         updatedAt: data.data.updatedAt,
       };
 
-      // 메시지 목록 업데이트
+      // 로컬 메시지 목록 업데이트
       setMessages((prev) =>
         prev.map((msg) =>
           msg.commentId === commentId ? { ...msg, ...updatedComment } : msg
         )
       );
 
-      // 스냅샷 상태 업데이트
-      const updatedSnapshots = snapshots.map((snapshot) => {
-        if (snapshot.id === parseInt(snapshotId)) {
-          return {
-            ...snapshot,
-            comments: snapshot.comments.map((comment) =>
-              comment.commentId === commentId
-                ? { ...comment, ...updatedComment }
-                : comment
-            ),
-          };
-        }
-        return snapshot;
-      });
+      // 스냅샷 업데이트 - comments가 없는 경우 처리
+      if (snapshots) {
+        const updatedSnapshots = snapshots.map((snapshot) => {
+          if (snapshot.id === parseInt(snapshotId)) {
+            const updatedComments = snapshot.comments
+              ? snapshot.comments.map((comment) =>
+                  comment.commentId === commentId
+                    ? { ...comment, ...updatedComment }
+                    : comment
+                )
+              : []; // comments가 없으면 빈 배열 사용
 
-      onSnapshotsUpdate(updatedSnapshots);
+            return {
+              ...snapshot,
+              comments: updatedComments,
+            };
+          }
+          return snapshot;
+        });
+
+        onSnapshotsUpdate?.(updatedSnapshots);
+      }
+
       setEditingId(null);
-      showAlert(data.message || "댓글이 수정되었습니다.", "success");
+      showAlert("댓글이 수정되었습니다.", "success");
     } catch (error) {
+      console.error("Edit error:", error);
       showAlert("서버 연결 오류가 발생했습니다.", "error");
     }
   };
