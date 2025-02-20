@@ -8,6 +8,7 @@ import { useEffect } from "react";
  * @param {ReactNode} props.children - 모달 내부 컨텐츠
  * @param {boolean} props.allowBackdropClose - 백드롭 클릭 시 닫기 허용 여부
  * @param {boolean} props.closeButton - 닫기 버튼 표시 여부
+ * @param {boolean} props.preventEscClose - ESC 키로 닫기 방지 여부
  * @returns
  */
 export default function Modal({
@@ -16,11 +17,12 @@ export default function Modal({
   children,
   allowBackdropClose = true,
   closeButton = false,
+  preventEscClose = false,
 }) {
   // ESC 키를 눌렀을 때 모달을 닫는 이벤트 핸들러 등록
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && !preventEscClose) {
         onClose();
       }
     };
@@ -34,7 +36,7 @@ export default function Modal({
     return () => {
       document.removeEventListener("keydown", handleEsc);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, preventEscClose]);
 
   // 모달이 닫혀있으면 아무것도 렌더링하지 않음
   if (!isOpen) return null;

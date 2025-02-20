@@ -81,6 +81,7 @@ export default function CreateRoomPage() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateRoom}
+        preventEscClose={true}
       />
     </>
   );

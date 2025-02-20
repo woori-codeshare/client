@@ -1,7 +1,12 @@
 import { useState } from "react";
 import Modal from "@/components/common/modal";
 
-export default function RoomCreateModal({ isOpen, onClose, onSubmit }) {
+export default function RoomCreateModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  preventEscClose,
+}) {
   const [title, setTitle] = useState("");
   const [password, setPassword] = useState("");
 
@@ -11,7 +16,12 @@ export default function RoomCreateModal({ isOpen, onClose, onSubmit }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} allowBackdropClose={false}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      allowBackdropClose={false}
+      preventEscClose={preventEscClose}
+    >
       <h2 className="text-xl font-semibold text-gray-200 mb-4">방 생성</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
