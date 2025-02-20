@@ -1,0 +1,102 @@
+/**
+ * Monaco Editor Theme
+ * @see https://microsoft.github.io/monaco-editor/
+ */
+
+/* 기본 배경 설정 */
+.monaco-editor,
+.monaco-editor-background,
+.monaco-editor .inputarea.ime-input {
+  background-color: transparent !important;
+}
+
+/* 마진 및 거터 영역 */
+.monaco-editor .margin {
+  background-color: transparent !important;
+  border-right: none !important;
+}
+
+/* 라운드 처리 */
+.monaco-editor,
+.monaco-editor .overflow-guard {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+/* 텍스트 선택 영역 */
+.monaco-editor .selected-text {
+  background-color: rgba(58, 61, 65, 0.4) !important;
+}
+
+/* 현재 라인 하이라이트 */
+.monaco-editor .current-line {
+  background-color: rgba(41, 41, 41, 0.2) !important;
+  border: none !important;
+}
+
+/* 들여쓰기 가이드 */
+.monaco-editor .indent-guide {
+  border-left: 1px solid rgba(157, 165, 180, 0.15) !important;
+}
+
+/* 괄호 쌍 가이드 */
+.monaco-editor .bracket-match {
+  border: 1px solid rgba(137, 221, 255, 0.3) !important;
+  background-color: transparent !important;
+}
+
+/* 줄 번호 */
+.monaco-editor .line-numbers {
+  color: rgba(157, 165, 180, 0.6) !important;
+  font-size: 14px !important;
+  border-right: none !important;
+}
+
+/* 현재 라인의 줄 번호 강조 */
+.monaco-editor .current-line ~ .line-numbers {
+  color: #89ddff !important;
+  font-weight: 600 !important;
+}
+
+.monaco-editor .line-numbers.active-line-number {
+  color: #89ddff !important;
+  font-weight: 600 !important;
+}
+
+/* 스크롤바 */
+.monaco-editor .scrollbar .slider {
+  background-color: rgba(121, 121, 121, 0.4) !important;
+  border-radius: 4px !important;
+}
+
+/* 파라미터 힌트 */
+.monaco-editor .parameter-hints-widget {
+  background-color: rgba(30, 33, 43, 0.95) !important;
+  border: 1px solid rgba(83, 89, 93, 0.5) !important;
+  color: #d4d4d4 !important;
+}
+
+/* 자동 완성 위젯 */
+.monaco-editor .suggest-widget {
+  background-color: rgba(30, 33, 43, 0.95) !important;
+  border: 1px solid rgba(83, 89, 93, 0.5) !important;
+}
+
+/* 코드 렌즈 */
+.monaco-editor .codelens-decoration {
+  color: rgba(137, 221, 255, 0.8) !important;
+}
+
+/* 에디터 패딩 */
+.monaco-editor .monaco-scrollable-element {
+  padding: 16px 0 !important;
+}
+
+/* 에러 및 경고 표시 */
+.monaco-editor .squiggly-error {
+  background: rgba(255, 99, 99, 0.4) !important;
+}
+
+.monaco-editor .squiggly-warning {
+  background: rgba(255, 204, 99, 0.4) !important;
+}

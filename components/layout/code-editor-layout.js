@@ -68,13 +68,16 @@ export default function CodeEditorLayout({
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)]">
+    <div className="flex h-[calc(100vh-64px)] overflow-hidden">
       {/* 좌측 사이드바 영역 */}
       <div
         className="h-full relative flex"
         style={{
           width: isSidebarOpen ? `${leftWidth}px` : "3rem",
-          transition: isSidebarOpen ? "none" : "width 200ms ease-in-out",
+          minWidth: isSidebarOpen ? `${leftWidth}px` : "3rem",
+          maxWidth: isSidebarOpen ? "50vw" : "3rem",
+          flexShrink: 0,
+          transition: "all 200ms ease-in-out",
         }}
       >
         {/* 아이콘 메뉴 */}
@@ -120,8 +123,8 @@ export default function CodeEditorLayout({
       </div>
 
       {/* 메인 컨텐츠 (코드 에디터) */}
-      <div className="flex-1 relative transition-all duration-200 ease-in-out">
-        <div className="p-2 h-full">
+      <div className="flex-1 h-full min-w-[300px] relative p-2 overflow-hidden">
+        <div className="h-full rounded-lg overflow-hidden">
           <CodeEditor
             code={code}
             onCodeChange={onCodeChange}

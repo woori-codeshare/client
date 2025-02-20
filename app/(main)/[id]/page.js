@@ -217,12 +217,14 @@ export default function CodeShareRoomPage() {
   const handleVersionChange = (index) => {
     if (index === null) {
       setCurrentVersion(null);
+      setActivePanel(null); // 현재 세션으로 돌아갈 때는 패널 닫기
       return;
     }
 
     if (snapshots[index]) {
       setCode(desanitizeCode(snapshots[index].code));
       setCurrentVersion(index);
+      setActivePanel(PANEL_CONFIGS.QUESTIONS.id); // 스냅샷으로 전환 시 자동으로 질문 패널 열기
     }
   };
 
