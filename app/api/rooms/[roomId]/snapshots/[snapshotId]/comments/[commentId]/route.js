@@ -4,13 +4,10 @@ export async function PATCH(request, { params }) {
   try {
     const { commentId } = await params;
     const body = await request.json();
+
+    console.log("댓글 수정 요청...");
+
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-    console.log("Updating comment:", {
-      commentId,
-      content: body.content,
-    });
-
     const response = await fetch(
       `${API_URL}/api/v1/comments/${commentId}/update`,
       {
@@ -22,20 +19,23 @@ export async function PATCH(request, { params }) {
       }
     );
 
-    console.log("Update response status:", response.status);
     const data = await response.json();
-    console.log("Update response data:", data);
+    console.log("댓글 수정 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.message || "댓글 수정에 실패했습니다." },
+        { error: data.errorMessage || "댓글 수정에 실패했습니다." },
         { status: response.status }
       );
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json({
+      message: "성공적으로 수정되었습니다.",
+      data: data.data,
+    });
   } catch (error) {
-    console.error("Comment update error:", error);
+    console.error("댓글 수정 중 에러가 발생했습니다:", error);
+
     return NextResponse.json(
       { error: "서버 에러가 발생했습니다." },
       { status: 500 }
@@ -46,27 +46,31 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const { commentId } = await params;
+
+    console.log("댓글 삭제 요청...");
+
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-    console.log("Deleting comment:", commentId);
-
     const response = await fetch(`${API_URL}/api/v1/comments/${commentId}`, {
       method: "DELETE",
     });
 
     const data = await response.json();
-    console.log("Delete response:", data);
+    console.log("댓글 삭제 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.message || "댓글 삭제에 실패했습니다." },
+        { error: data.errorMessage || "댓글 삭제에 실패했습니다." },
         { status: response.status }
       );
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json({
+      message: "성공적으로 삭제되었습니다.",
+      data: data.data,
+    });
   } catch (error) {
-    console.error("Error deleting comment:", error);
+    console.error("댓글 삭제 중 에러가 발생했습니다:", error);
+
     return NextResponse.json(
       { error: "서버 에러가 발생했습니다." },
       { status: 500 }

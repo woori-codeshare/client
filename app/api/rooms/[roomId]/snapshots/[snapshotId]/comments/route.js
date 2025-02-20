@@ -1,17 +1,49 @@
 import { NextResponse } from "next/server";
 
-export async function POST(request, { params }) {
+export async function GET(request, { params }) {
   try {
-    const { snapshotId } = params;
-    const body = await request.json();
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const { snapshotId } = await params;
+    console.log("댓글 조회 요청...");
 
-    console.log("Creating comment:", {
-      snapshotId,
-      content: body.content,
-      parentCommentId: body.parentCommentId || null, // 0 대신 null 사용
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const response = await fetch(`${API_URL}/api/v1/comments/${snapshotId}`, {
+      headers: {
+        accept: "application/json",
+      },
     });
 
+    const data = await response.json();
+    console.log("댓글 조회 결과:", data);
+
+    if (!response.ok) {
+      return NextResponse.json(
+          { error: data.errorMessage || "댓글 조회에 실패했습니다." },
+          { status: response.status }
+      );
+    }
+
+    return NextResponse.json({
+      message: "성공적으로 조회되었습니다.",
+      data: data.data,
+    });
+  } catch (error) {
+    console.error("댓글 조회 중 에러가 발생했습니다:", error);
+
+    return NextResponse.json(
+        { error: "서버 에러가 발생했습니다." },
+        { status: 500 }
+    );
+  }
+}
+
+export async function POST(request, { params }) {
+  try {
+    const { snapshotId } = await params;
+    const body = await request.json();
+
+    console.log("질문/댓글 작성 요청...");
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(
       `${API_URL}/api/v1/comments/${snapshotId}/new`,
       {
@@ -21,16 +53,17 @@ export async function POST(request, { params }) {
         },
         body: JSON.stringify({
           content: body.content,
-          parentCommentId: body.parentCommentId || null, // 0 대신 null 사용
+          parentCommentId: body.parentCommentId || null,
         }),
       }
     );
 
     const data = await response.json();
+    console.log("질문/댓글 작성 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.message || "질문 및 답글 작성에 실패했습니다." },
+        { error: data.errorMessage || "질문 및 답글 작성에 실패했습니다." },
         { status: response.status }
       );
     }
@@ -44,40 +77,10 @@ export async function POST(request, { params }) {
       message: successMessage,
       data: data.data,
     });
+
   } catch (error) {
-    return NextResponse.json(
-      { error: "서버 에러가 발생했습니다." },
-      { status: 500 }
-    );
-  }
-}
+    console.error("질문/댓글 작성 중 에러가 발생했습니다:", error);
 
-export async function GET(request, { params }) {
-  try {
-    const { snapshotId } = params;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-    console.log("Fetching comments for snapshot:", snapshotId);
-    const response = await fetch(`${API_URL}/api/v1/comments/${snapshotId}`, {
-      headers: {
-        accept: "application/json",
-      },
-    });
-
-    console.log("Response status:", response.status);
-    const data = await response.json();
-    console.log("Comments data:", data);
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: data.message || "댓글 조회에 실패했습니다." },
-        { status: response.status }
-      );
-    }
-
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("Comments fetch error:", error);
     return NextResponse.json(
       { error: "서버 에러가 발생했습니다." },
       { status: 500 }

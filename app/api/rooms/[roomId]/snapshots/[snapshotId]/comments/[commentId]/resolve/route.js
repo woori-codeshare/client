@@ -2,19 +2,16 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(request, { params }) {
   try {
-    const { commentId } = params;
+    const { commentId } = await params;
     const body = await request.json();
+
+    console.log("댓글 해결 상태 변경 요청...");
+
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-    console.log("Updating comment resolve status:", {
-      commentId,
-      solved: body.solved,
-    });
-
     const response = await fetch(
       `${API_URL}/api/v1/comments/${commentId}/resolve`,
       {
-        method: "PATCH", // 백엔드 API 스펙에 맞춰 PATCH 메서드 사용
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -23,18 +20,22 @@ export async function PATCH(request, { params }) {
     );
 
     const data = await response.json();
-    console.log("Resolve status update response:", data);
+    console.log("댓글 해결 상태 변경 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.message || "해결 상태 변경에 실패했습니다." },
+        { error: data.errorMessage || "해결 상태 변경에 실패했습니다." },
         { status: response.status }
       );
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json({
+      message: "해결 상태가 성공적으로 변경되었습니다.",
+      data: data.data,
+    });
   } catch (error) {
-    console.error("Error updating resolve status:", error);
+    console.error("댓글 해결 상태 변경 중 에러가 발생했습니다:", error);
+
     return NextResponse.json(
       { error: "서버 에러가 발생했습니다." },
       { status: 500 }

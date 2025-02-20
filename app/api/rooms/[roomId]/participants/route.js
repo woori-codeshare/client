@@ -20,8 +20,10 @@ export async function POST(request, { params }) {
     const { roomId } = params;
     const { searchParams } = new URL(request.url);
     const password = searchParams.get("password");
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+    console.log("방 참가 요청...");
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(
       `${API_URL}/api/v1/rooms/enter/${roomId}?password=${password}`,
       {
@@ -30,6 +32,7 @@ export async function POST(request, { params }) {
     );
 
     const data = await response.json();
+    console.log("방 참가 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
@@ -41,8 +44,13 @@ export async function POST(request, { params }) {
       );
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json({
+      message: "방에 성공적으로 참가되었습니다.",
+      data: data.data,
+    });
   } catch (error) {
+    console.error("방 참가 중 에러가 발생했습니다:", error);
+
     return NextResponse.json(
       { error: "서버 에러가 발생했습니다." },
       { status: 500 }
