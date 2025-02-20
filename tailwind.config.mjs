@@ -11,6 +11,21 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      animation: {
+        "spin-slow": "spin 8s linear infinite",
+        glow: "glow 1s ease-in-out infinite alternate",
+        spotlight: "spotlight 2.5s linear infinite",
+      },
+      keyframes: {
+        glow: {
+          from: { opacity: "0.4" },
+          to: { opacity: "1" },
+        },
+        spotlight: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+      },
     },
   },
   plugins: [],

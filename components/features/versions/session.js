@@ -1,4 +1,4 @@
-import { FaCode } from "react-icons/fa";
+import { GoBroadcast } from "react-icons/go";
 
 /**
  * 현재 작업 중인 코드 세션을 표시하는 컴포넌트
@@ -8,47 +8,61 @@ import { FaCode } from "react-icons/fa";
  */
 export default function CurrentSession({ isActive = true, onClick }) {
   return (
-    <div
-      onClick={onClick}
-      className={`
-        group relative p-2.5 rounded-lg cursor-pointer
-        border transition-all duration-200
-        ${
-          isActive
-            ? "border-emerald-500/30 bg-emerald-500/10"
-            : "border-transparent hover:border-gray-700 hover:bg-gray-800"
-        }
-      `}
-    >
-      <div className="flex items-center gap-3">
-        {/* 아이콘 */}
-        <div
-          className={`
-          transition-colors duration-200
-          ${
-            isActive
-              ? "text-emerald-400"
-              : "text-gray-400 group-hover:text-emerald-400"
-          }
+    <div className="overflow-hidden rounded-lg relative">
+      {/* 스포트라이트 레이어 */}
+      <div
+        className={`
+          absolute inset-0 rounded-lg
+          before:absolute before:inset-[-1px] before:rounded-lg before:animate-spotlight
+          before:bg-[conic-gradient(from_0deg,transparent_0deg,transparent_60deg,#ff0000_75deg,transparent_90deg,transparent_240deg)]
+          ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
         `}
-        >
-          <FaCode size={15} />
-        </div>
+      />
 
-        {/* 컨텐츠 */}
-        <div className="flex-1 min-w-0">
-          <span
-            className={`
-            font-medium truncate transition-colors duration-200
+      {/* 배경 레이어 - 항상 일정한 마진 유지 */}
+      <div className="relative m-[2px] rounded-lg bg-gray-900">
+        {/* 메인 컨텐츠 - border 공간을 항상 확보 */}
+        <div
+          onClick={onClick}
+          className={`
+            p-4 rounded-lg cursor-pointer border
+            ${
+              isActive
+                ? "border-emerald-500/30 bg-emerald-500/10"
+                : "border-transparent hover:bg-gray-800"
+            }
+          `}
+        >
+          <div className="flex items-center gap-4">
+            <div
+              className={`
+            transition-colors duration-200
             ${
               isActive
                 ? "text-emerald-400"
-                : "text-gray-300 group-hover:text-emerald-400"
+                : "text-gray-400 group-hover:text-emerald-400"
             }
           `}
-          >
-            Current Session
-          </span>
+            >
+              <GoBroadcast size={15} />
+            </div>
+
+            {/* 컨텐츠 */}
+            <div className="flex-1 min-w-0">
+              <span
+                className={`
+              font-medium truncate transition-colors duration-200
+              ${
+                isActive
+                  ? "text-emerald-400"
+                  : "text-gray-300 group-hover:text-emerald-400"
+              }
+            `}
+              >
+                Current Session
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
