@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { formatRelativeTime, truncateText } from "@/utils/formatters";
+import { formatRelativeTime } from "@/utils/formatters";
 
 /**
  * 개별 스냅샷 항목을 표시하는 컴포넌트
@@ -72,8 +72,8 @@ export default function SnapshotItem({
         transition-colors duration-200 relative
         ${
           isActive
-            ? "bg-blue-500/20 border border-blue-500/30"
-            : "hover:bg-gray-800/50 border border-transparent hover:border-gray-700"
+            ? "bg-blue-50 dark:bg-blue-500/20 border border-blue-500/30"
+            : "hover:bg-gray-100 dark:hover:bg-gray-800/50 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
         }
       `}
     >
@@ -82,7 +82,7 @@ export default function SnapshotItem({
         <div
           className={`
           text-xs
-          ${isActive ? "text-blue-400" : "text-gray-500"}
+          ${isActive ? "text-blue-500" : "text-gray-600 dark:text-gray-500"}
         `}
         >
           {formattedTime}
@@ -94,7 +94,9 @@ export default function SnapshotItem({
         className={`
         font-medium text-sm truncate
         ${
-          isActive ? "text-blue-400" : "text-gray-200 group-hover:text-blue-400"
+          isActive
+            ? "text-blue-500"
+            : "text-gray-700 dark:text-gray-200 group-hover:text-blue-500 dark:group-hover:text-blue-400"
         }
       `}
       >
@@ -103,15 +105,15 @@ export default function SnapshotItem({
 
       {/* 스냅샷 설명 (존재하는 경우에만 표시) */}
       {snapshot.description && (
-        <div className="text-xs text-gray-400 mt-1.5 line-clamp-2">
+        <div className="text-xs mt-1.5 line-clamp-2 text-gray-500 dark:text-gray-400">
           {snapshot.description}
         </div>
       )}
 
-      {/* 활성화 상태 표시 도트 - 구조 수정 */}
+      {/* 활성화 상태 표시 도트 */}
       {isActive && (
         <div className="absolute -left-[3px] top-1/2 -translate-y-1/2">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
         </div>
       )}
     </motion.div>

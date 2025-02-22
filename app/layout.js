@@ -11,6 +11,19 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko" suppressHydrationWarning className="overflow-hidden">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
         <meta name="grammarly-verification" content="off" />
         <style>
           {`
@@ -25,7 +38,7 @@ export default function RootLayout({ children }) {
         </style>
       </head>
       <body
-        className="bg-gray-900 text-gray-100 overflow-hidden"
+        className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-hidden"
         suppressHydrationWarning
       >
         <AlertProvider>

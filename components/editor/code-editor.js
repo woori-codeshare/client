@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { FaCode, FaCopy, FaCamera, FaCheck } from "react-icons/fa";
 import Editor from "@monaco-editor/react";
 import CreateSnapshotModal from "./create-snapshot-modal";
-import { detectLanguage } from "../../utils/detect-language";
+import { detectLanguage } from "@/utils/detect-language";
 import "../../styles/editor-theme.css";
 
 /**
@@ -34,6 +34,7 @@ export default function CodeEditor({
   const [detectedLanguage, setDetectedLanguage] = useState(
     language || "javascript"
   );
+  const [isDark, setIsDark] = useState(false); // 다크모드 상태 추가
   const editorRef = useRef(null);
 
   /**
@@ -122,20 +123,57 @@ export default function CodeEditor({
     }
   }, [isSidebarOpen, isRightPanelOpen]);
 
+  // 다크모드 감지 및 업데이트
+  useEffect(() => {
+    const updateTheme = () => {
+      const isDarkMode = document.documentElement.classList.contains("dark");
+      setIsDark(isDarkMode);
+      if (editorRef.current) {
+        editorRef.current.updateOptions({
+          theme: isDarkMode ? "vs-dark" : "vs"
+        });
+      }
+    };
+
+    // 초기 테마 설정
+    updateTheme();
+
+    // MutationObserver로 html 클래스 변경 감지
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          updateTheme();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="flex flex-col h-full px-2 py-2">
       {/* 헤더 영역 */}
       <div className="flex items-center mb-4">
         <div className="flex items-center gap-3">
-          <FaCode className="text-blue-400 text-2xl" />
-          <h2 className="text-xl font-medium">Code Editor</h2>
+          <FaCode className="text-blue-500 dark:text-blue-400 text-2xl" />
+          <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100">
+            Code Editor
+          </h2>
         </div>
 
         <div className="flex items-center gap-2 ml-4">
           {/* 코드 복사 버튼 */}
           <button
             onClick={handleCopy}
-            className="p-2 text-gray-400 hover:text-blue-400 transition-colors rounded hover:bg-gray-800"
+            className="p-2 text-gray-600 dark:text-gray-400 
+              hover:text-blue-500 dark:hover:text-blue-400 
+              transition-colors rounded 
+              hover:bg-gray-100 dark:hover:bg-gray-800"
             title={copied ? "Copied" : "Copy"}
           >
             {copied ? <FaCheck size={14} /> : <FaCopy size={14} />}
@@ -145,7 +183,10 @@ export default function CodeEditor({
           {!isReadOnly && (
             <button
               onClick={() => setIsModalOpen(true)}
-              className="p-2 text-gray-400 hover:text-blue-400 transition-colors rounded hover:bg-gray-800"
+              className="p-2 text-gray-600 dark:text-gray-400 
+                hover:text-blue-500 dark:hover:text-blue-400 
+                transition-colors rounded 
+                hover:bg-gray-100 dark:hover:bg-gray-800"
               title="Snapshot"
             >
               <FaCamera size={14} />
@@ -170,62 +211,37 @@ export default function CodeEditor({
             });
           }}
           options={{
-            // 기본 에디터 설정
-            theme: "vs-dark", // 다크 테마 사용
+            theme: isDark ? "vs-dark" : "vs",
             fontSize: 14, // 폰트 크기
             tabSize: 2, // 탭 크기
-            padding: { top: 16, bottom: 16 }, // 상하 패딩 증가
+            padding: { top: 16, bottom: 16 },
 
             // 자동 완성 및 힌트
             quickSuggestions: {
-              other: true, // 일반 코드
+              other: true,
+              comments: false,
+              strings: false,
             },
             parameterHints: {
-              enabled: true, // 파라미터 힌트
+              enabled: true,
             },
 
-            // 코드 구조
-            foldingStrategy: "indentation", // 들여쓰기 기반 폴딩
-
-            // UI 요소
-            minimap: { enabled: false }, // 미니맵 비활성화
-
-            // 가이드라인
-            guides: {
-              indentation: true, // 들여쓰기 가이드
-              bracketPairs: true, // 괄호 쌍 가이드
-            },
-
-            // 검색 기능 비활성화
-            find: {
-              addExtraSpaceOnTop: false,
-              autoFindInSelection: "never",
-              seedSearchStringFromSelection: false,
-            },
+            // 에디터 기본 설정
+            folding: true,
+            foldingStrategy: "indentation",
             wordWrap: "on",
             links: false,
-
-            // 검색 관련 커맨드 비활성화
             contextmenu: false,
-            commandCenter: false,
-
-            // 에디터 기본 키 바인딩 커스터마이징
-            keyboardNavigationDelegate: {
-              onKeyDown: (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === "f") {
-                  return true; // 이벤트 처리 완료로 표시
-                }
-                return false;
-              },
-            },
-
-            // 기타 설정
-            readOnly: isDisabled || isReadOnly, // 읽기 전용 모드
-            automaticLayout: true, // 자동 레이아웃 조정
-            fixedOverflowWidgets: true,
-            scrollBeyondLastLine: false, // 마지막 줄 이후 스크롤 방지
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            lineNumbers: "on",
+            readOnly: isDisabled || isReadOnly,
+            fontFamily: "Monaco, 'Courier New', monospace"
           }}
-          className="rounded-lg"
+          className={`rounded-lg border ${
+            isDark ? "border-gray-800" : "border-gray-200"
+          } shadow-sm`}
           onMount={(editor, monaco) => {
             editorRef.current = editor;
             // 에디터 마운트 시 검색 관련 커맨드 제거
@@ -239,6 +255,16 @@ export default function CodeEditor({
             setTimeout(() => {
               editor.layout();
             }, 100);
+            // 마운트 시 초기 테마 적용
+            editor.updateOptions({
+              theme: isDark ? "vs-dark" : "vs",
+              foreground: isDark ? "#E4E4E7" : "#1F2937",
+              background: isDark ? "#18181B" : "#FFFFFF",
+              lineNumbers: "on",
+              renderLineHighlight: "all",
+              renderLineHighlightOnlyWhenFocus: true,
+              renderFinalNewline: "dimmed",
+            });
           }}
         />
       </div>

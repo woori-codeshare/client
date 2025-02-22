@@ -37,44 +37,68 @@ export default function CreateSnapshotModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} closeButton={true}>
+    <Modal isOpen={isOpen} onClose={onClose} allowBackdropClose={false}>
       {/* 모달 제목 */}
-      <h2 className="text-xl font-medium mb-4">Create Snapshot</h2>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-4">
+        Create Snapshot
+      </h2>
 
       {/* 스냅샷 생성 폼 */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* 제목 입력 필드 */}
         <div>
-          <label className="block text-sm text-gray-400 mb-2">Title</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Title
+          </label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-            placeholder="Enter snapshot title..."
+            className="w-full px-3 py-2
+              bg-white dark:bg-gray-800 
+              border border-gray-300 dark:border-gray-700
+              text-gray-900 dark:text-gray-200
+              focus:ring-2 focus:ring-blue-500/20
+              focus:border-blue-500/50
+              rounded-lg transition-colors"
+            placeholder="Enter snapshot title"
+            required
+            autoFocus
           />
         </div>
 
         {/* 설명 입력 필드 */}
         <div>
-          <label className="block text-sm text-gray-400 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Description
           </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm h-24 resize-none"
-            placeholder="Enter snapshot description..."
+            className="w-full px-3 py-2
+              bg-white dark:bg-gray-800
+              border border-gray-300 dark:border-gray-700
+              text-gray-900 dark:text-gray-200
+              focus:ring-2 focus:ring-blue-500/20
+              focus:border-blue-500/50
+              rounded-lg transition-colors
+              h-24 resize-none"
+            placeholder="Enter snapshot description"
           />
         </div>
 
         {/* 버튼 그룹 */}
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-2">
           {/* 취소 버튼 */}
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm text-gray-400 hover:text-gray-300"
+            className="px-4 py-2 rounded-lg
+              bg-gray-50 hover:bg-gray-100
+              dark:bg-gray-700/50 dark:hover:bg-gray-700
+              text-gray-700 dark:text-gray-300
+              border border-gray-200 dark:border-gray-600
+              transition-colors"
           >
             Cancel
           </button>
@@ -82,9 +106,14 @@ export default function CreateSnapshotModal({
           {/* 스냅샷 생성 버튼 */}
           <button
             type="submit"
-            className="px-4 py-2 text-sm bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30"
+            className="px-4 py-2 rounded-lg
+              bg-blue-50 hover:bg-blue-100
+              dark:bg-blue-500/20 dark:hover:bg-blue-500/30
+              text-blue-600 dark:text-blue-400
+              border border-blue-200 dark:border-blue-500/20
+              transition-colors"
           >
-            Create Snapshot
+            Create
           </button>
         </div>
       </form>

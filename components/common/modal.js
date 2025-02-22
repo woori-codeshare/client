@@ -55,12 +55,18 @@ export default function Modal({
       onClick={handleBackdropClick}
     >
       {/* 모달 창: 실제 컨텐츠를 포함하는 박스 */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 w-[480px] relative">
+      <div
+        className="bg-white dark:bg-gray-900 rounded-lg p-6 w-[480px] relative
+        border border-blue-200 dark:border-blue-500/20
+        shadow-lg shadow-blue-500/5"
+      >
         {/* 닫기 버튼 */}
         {closeButton && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-300"
+            className="absolute top-4 right-4 
+              text-gray-400 hover:text-gray-600
+              dark:text-gray-500 dark:hover:text-gray-300"
           >
             ✕
           </button>

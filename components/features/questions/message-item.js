@@ -65,7 +65,7 @@ export default function MessageItem({
     // 메시지 컨테이너 (답글일 경우 왼쪽 패딩 추가)
     <div className={`flex gap-3 items-start ${isReply ? "pl-8" : ""}`}>
       {/* 사용자 아바타 */}
-      <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-gray-400">
+      <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-gray-500 dark:text-gray-400">
         <FaUserCircle size={32} />
       </div>
 
@@ -84,20 +84,29 @@ export default function MessageItem({
               type="text"
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="flex-1 w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm mb-2"
+              className="flex-1 w-full rounded-lg px-3 py-2 text-sm mb-2 transition-colors 
+                bg-white dark:bg-gray-800 
+                border-gray-200 dark:border-gray-700 
+                text-gray-900 dark:text-gray-200 
+                focus:border-blue-400 dark:focus:border-blue-500/50 
+                border"
               autoFocus
             />
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => onEdit(null)}
-                className="px-3 py-1 text-sm text-gray-400 hover:text-gray-300"
+                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
                 취소
               </button>
               <button
                 type="submit"
-                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                className={`px-3 py-1 text-sm rounded transition-colors ${
+                  !editContent.trim() || editContent === message.content
+                    ? "opacity-50 cursor-not-allowed"
+                    : "bg-blue-500 text-white hover:bg-blue-600"
+                }`}
                 disabled={
                   !editContent.trim() || editContent === message.content
                 }
@@ -109,18 +118,20 @@ export default function MessageItem({
         ) : (
           // 일반 메시지 UI
           <div
-            className={`p-4 rounded-lg border ${
+            className={`p-4 rounded-lg border transition-colors ${
               message.solved
-                ? "bg-blue-500/10 border-blue-500/20"
-                : "bg-gray-700/30 border-gray-700/50"
+                ? "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20"
+                : "bg-gray-50 dark:bg-gray-700/30 border-gray-200 dark:border-gray-700/50"
             }`}
           >
-            <p className="text-sm">{message.content}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-200">
+              {message.content}
+            </p>
           </div>
         )}
 
         {/* 메시지 메타 정보 (시간, 답글 버튼) */}
-        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+        <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-500">
           <FaRegClock size={10} />
           <span>{formattedTime}</span>
           <div className="flex items-center gap-2 ml-auto">
@@ -130,10 +141,10 @@ export default function MessageItem({
                   onClick={() =>
                     onToggleSolved(message.commentId, !message.solved)
                   }
-                  className={`flex items-center gap-1 ${
+                  className={`flex items-center gap-1 transition-colors ${
                     message.solved
-                      ? "text-green-400"
-                      : "text-gray-400 hover:text-green-400"
+                      ? "text-green-500"
+                      : "text-gray-500 hover:text-green-500 dark:text-gray-400 dark:hover:text-green-400"
                   }`}
                   title={message.solved ? "질문 해결 취소" : "질문 해결 완료"}
                 >
@@ -144,7 +155,7 @@ export default function MessageItem({
                   <>
                     <button
                       onClick={() => onEdit(message.commentId)}
-                      className="text-gray-400 hover:text-blue-400 flex items-center gap-1"
+                      className="flex items-center gap-1 transition-colors text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400"
                     >
                       <FaEdit size={10} />
                       <span>수정</span>
@@ -155,7 +166,7 @@ export default function MessageItem({
                           onDelete(message.commentId);
                         }
                       }}
-                      className="text-gray-400 hover:text-red-400 flex items-center gap-1"
+                      className="flex items-center gap-1 transition-colors text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400"
                     >
                       <FaTrash size={10} />
                       <span>삭제</span>
@@ -167,7 +178,7 @@ export default function MessageItem({
             {!isReply && (
               <button
                 onClick={() => onReply(message.commentId)}
-                className="text-gray-400 hover:text-blue-400 flex items-center gap-1"
+                className="flex items-center gap-1 transition-colors text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400"
               >
                 <FaReply size={10} />
                 <span>답글</span>
@@ -192,12 +203,20 @@ export default function MessageItem({
                 })
               }
               placeholder="Write a reply..."
-              className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+              className="flex-1 px-3 py-2 rounded-lg text-sm border transition-colors
+                bg-white dark:bg-gray-800 
+                border-gray-200 dark:border-gray-700 
+                text-gray-900 dark:text-gray-200 
+                focus:border-blue-400 dark:focus:border-blue-500/50"
               autoFocus
             />
             <button
               type="submit"
-              className="p-2 text-blue-400 hover:text-blue-300 disabled:text-gray-600"
+              className={`p-2 transition-colors ${
+                !replyingTo?.content?.trim()
+                  ? "opacity-50 cursor-not-allowed"
+                  : "text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+              }`}
               disabled={!replyingTo?.content?.trim()}
             >
               <FaPaperPlane size={16} />

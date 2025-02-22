@@ -1,3 +1,5 @@
+"use client";
+
 import { FaQuestion, FaVoteYea, FaHistory } from "react-icons/fa";
 import CodeEditor from "@/components/editor/code-editor";
 import ResizeHandle from "@/components/common/resize-handle";
@@ -81,16 +83,16 @@ export default function CodeEditorLayout({
         }}
       >
         {/* 아이콘 메뉴 */}
-        <div className="w-12 h-full bg-gray-900 border-r border-gray-800 flex-shrink-0 z-20">
+        <div className="w-12 h-full border-r flex-shrink-0 z-20 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
           <div className="flex flex-col items-center py-4">
             <button
               onClick={onSidebarToggle}
               className={`p-3 rounded-lg transition-colors ${
                 isSidebarOpen
-                  ? "bg-blue-500/20 text-blue-400"
-                  : "text-gray-400 hover:text-gray-300"
+                  ? "bg-blue-500/20 text-blue-600"
+                  : "text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
-              title="스냅샷"
+              title="snapshot"
             >
               <FaHistory size={18} />
             </button>
@@ -100,10 +102,11 @@ export default function CodeEditorLayout({
         {/* 버전 관리 패널 */}
         <div
           className={`
-            h-full bg-gray-900 border-r border-gray-800
-            transition-transform duration-200 ease-in-out relative
-            ${isSidebarOpen ? "w-[calc(100%-3rem)]" : "w-0 overflow-hidden"}
-          `}
+          h-full border-r
+          transition-transform duration-200 ease-in-out relative
+          bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800
+          ${isSidebarOpen ? "w-[calc(100%-3rem)]" : "w-0 overflow-hidden"}
+        `}
         >
           <VersionsPanel
             snapshots={snapshots}
@@ -117,13 +120,14 @@ export default function CodeEditorLayout({
           <ResizeHandle
             onResize={onLeftResize}
             direction="left"
-            className="bg-gray-800 z-30"
+            className="bg-gray-200 dark:bg-gray-800"
+            z-30
           />
         )}
       </div>
 
       {/* 메인 컨텐츠 (코드 에디터) */}
-      <div className="flex-1 h-full min-w-[300px] relative p-2 overflow-hidden">
+      <div className="flex-1 h-full min-w-[300px] relative p-2 overflow-hidden bg-gray-50 dark:bg-gray-900">
         <div className="h-full rounded-lg overflow-hidden">
           <CodeEditor
             code={code}
@@ -140,13 +144,13 @@ export default function CodeEditorLayout({
       {/* 우측 패널 영역 */}
       <div className="relative w-12">
         {/* 우측 고정 영역 */}
-        <div className="fixed right-0 top-16 bottom-0 w-12 bg-gray-900 border-l border-gray-800 flex flex-col items-center py-4 z-20">
+        <div className="fixed right-0 top-16 bottom-0 w-12 border-l flex flex-col items-center py-4 z-20 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
           <button
             onClick={() => onPanelChange("comments")}
             className={`p-3 mb-2 rounded-lg transition-colors ${
               activePanel === "comments"
-                ? "bg-blue-500/20 text-blue-400"
-                : "text-gray-400 hover:text-gray-300"
+                ? "bg-blue-500/20 text-blue-600"
+                : "text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
             } ${
               currentVersion === null ? "opacity-50 cursor-not-allowed" : ""
             }`}
@@ -163,8 +167,8 @@ export default function CodeEditorLayout({
             onClick={() => onPanelChange("voting")}
             className={`p-3 rounded-lg transition-colors ${
               activePanel === "voting"
-                ? "bg-blue-500/20 text-blue-400"
-                : "text-gray-400 hover:text-gray-300"
+                ? "bg-blue-500/20 text-blue-600"
+                : "text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
             } ${
               currentVersion === null ? "opacity-50 cursor-not-allowed" : ""
             }`}
@@ -181,19 +185,21 @@ export default function CodeEditorLayout({
 
         {/* 패널 컨텐츠 */}
         <div
-          className={`fixed right-12 top-16 bottom-0 bg-gray-900 border-l border-gray-800
+          className={`fixed right-12 top-16 bottom-0 border-l
           transition-transform duration-200 ease-in-out flex
+          bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800
           ${
             activePanel && currentVersion !== null
               ? "translate-x-0"
               : "translate-x-full"
-          }`}
+          }
+        `}
           style={{ width: `${rightWidth}px` }}
         >
           <ResizeHandle
             onResize={onRightResize}
             direction="right"
-            className="bg-gray-800"
+            className="bg-gray-200 dark:bg-gray-800"
           />
           <div className="flex-1 p-4 h-full ml-1">{renderActivePanel()}</div>
         </div>

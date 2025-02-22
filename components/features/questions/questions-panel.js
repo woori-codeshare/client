@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
 import { FaQuestion, FaPaperPlane } from "react-icons/fa";
 import MessageItem from "./message-item";
@@ -438,20 +440,29 @@ export default function QuestionsPanel({
   };
 
   return (
-    <div className="panel flex flex-col h-full">
-      {/* 패널 헤더: 제목과 질문 개수 표시 */}
-      <div className="flex items-center gap-3">
-        <FaQuestion className="text-blue-400" />
-        <div>
-          <h2 className="text-lg font-medium">Questions</h2>
-          <p className="text-xs text-gray-400">{messages.length} questions</p>
+    <div className="h-full p-2 flex flex-col text-gray-800 dark:text-gray-100">
+      {/* 패널 헤더 */}
+      <div className="group p-2.5 rounded-lg">
+        <div className="flex items-center gap-3">
+          <div className="text-blue-500">
+            <FaQuestion size={15} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="font-medium text-blue-500">Questions</span>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {messages.length} questions
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* 구분선 */}
+      <div className="h-px bg-gray-200 dark:bg-gray-800 my-4" />
+
       {/* 메시지 목록: 질문과 답변을 계층 구조로 표시 */}
-      <div className="flex-1 space-y-4 mt-4 overflow-y-auto">
+      <div className="flex-1 space-y-3 overflow-y-auto">
         {messages.map((message) => (
-          <div key={message.commentId} className="space-y-3">
+          <div key={message.commentId} className="p-1 space-y-3">
             <MessageItem
               message={message}
               onReply={handleReply}
@@ -480,24 +491,37 @@ export default function QuestionsPanel({
         ))}
       </div>
 
-      {/* 새 질문 입력 폼 */}
-      <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
-        <input
-          type="text"
-          value={newQuestion}
-          onChange={(e) => setNewQuestion(e.target.value)}
-          placeholder="Ask a question..."
-          className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          className="p-2 text-blue-400 hover:text-blue-300 disabled:text-gray-600"
-          disabled={!newQuestion.trim()} // 빈 질문 제출 방지
-          title="Send question"
-        >
-          <FaPaperPlane size={16} />
-        </button>
-      </form>
+      {/* 입력 폼 */}
+      <div className="mt-4 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <input
+            type="text"
+            value={newQuestion}
+            onChange={(e) => setNewQuestion(e.target.value)}
+            placeholder="Ask a question..."
+            className="flex-1 px-3 py-2 rounded-lg text-sm border transition-colors
+              bg-white dark:bg-gray-700/50 
+              border-gray-200 dark:border-gray-600 
+              text-gray-900 dark:text-gray-200 
+              focus:border-blue-400 dark:focus:border-blue-500/50"
+          />
+          <button
+            type="submit"
+            className={`
+              p-2 rounded-lg transition-colors
+              ${
+                newQuestion.trim()
+                  ? "bg-blue-50 dark:bg-blue-500/20 text-blue-500 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/30"
+                  : "opacity-50 cursor-not-allowed"
+              }
+            `}
+            disabled={!newQuestion.trim()}
+            title="Send question"
+          >
+            <FaPaperPlane size={16} />
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

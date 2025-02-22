@@ -1,7 +1,29 @@
 /**
- * Monaco Editor Theme
- * @see https://microsoft.github.io/monaco-editor/
+ * Monaco Editor Theme Customization
+ * @see https://microsoft.github.io/monaco-editor/docs.html
  */
+
+/* Light Mode */
+.monaco-editor {
+  --editor-bg: #ffffff;
+  --editor-fg: #1f2937;
+  --line-number: #64748b;
+  --line-number-active: #2563eb;
+  --selection-bg: rgba(37, 99, 235, 0.1);
+  --indent-guide: rgba(100, 116, 139, 0.15);
+  --current-line: rgba(241, 245, 249, 0.5);
+}
+
+/* Dark Mode */
+html.dark .monaco-editor {
+  --editor-bg: #18181b;
+  --editor-fg: #e4e4e7;
+  --line-number: rgba(157, 165, 180, 0.6);
+  --line-number-active: #89ddff;
+  --selection-bg: rgba(137, 221, 255, 0.15);
+  --indent-guide: rgba(157, 165, 180, 0.15);
+  --current-line: rgba(39, 39, 42, 0.5);
+}
 
 /* 기본 배경 설정 */
 .monaco-editor,
@@ -10,17 +32,86 @@
   background-color: transparent !important;
 }
 
-/* 마진 및 거터 영역 */
-.monaco-editor .margin {
-  background-color: transparent !important;
+/* 텍스트 색상 */
+.monaco-editor .view-line {
+  color: var(--editor-fg) !important;
+}
+
+/* 줄 번호 */
+.monaco-editor .line-numbers {
+  color: var(--line-number) !important;
+  font-size: 14px !important;
   border-right: none !important;
 }
 
-/* 라운드 처리 */
+/* 현재 라인의 줄 번호 강조 */
+.monaco-editor .current-line ~ .line-numbers,
+.monaco-editor .line-numbers.active-line-number {
+  color: var(--line-number-active) !important;
+  font-weight: 600 !important;
+}
+
+/* 들여쓰기 가이드 */
+.monaco-editor .indent-guide {
+  border-left: 1px solid var(--indent-guide) !important;
+}
+
+/* 현재 라인 하이라이트 */
+.monaco-editor .current-line {
+  background-color: var(--current-line) !important;
+  border: none !important;
+}
+
+/* 선택 영역 */
+.monaco-editor .selected-text {
+  background-color: var(--selection-bg) !important;
+}
+
+/* 스크롤바 */
+.monaco-editor .scrollbar .slider {
+  background-color: rgba(121, 121, 121, 0.4) !important;
+  border-radius: 4px !important;
+}
+
+/* 자동 완성 위젯 - 라이트 모드 */
+.monaco-editor .suggest-widget {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1f2937 !important;
+}
+
+/* 자동 완성 위젯 - 다크 모드 */
+html.dark .monaco-editor .suggest-widget {
+  background-color: #27272a !important;
+  border: 1px solid #3f3f46 !important;
+  color: #e4e4e7 !important;
+}
+
+/* 기타 스타일 설정 */
 .monaco-editor,
 .monaco-editor .overflow-guard {
   border-radius: 8px !important;
   overflow: hidden !important;
+}
+
+/* 에디터 패딩 */
+.monaco-editor .monaco-scrollable-element {
+  padding: 16px 0 !important;
+}
+
+/* 에러 및 경고 표시 */
+.monaco-editor .squiggly-error {
+  background: rgba(255, 99, 99, 0.4) !important;
+}
+
+.monaco-editor .squiggly-warning {
+  background: rgba(255, 204, 99, 0.4) !important;
+}
+
+/* 마진 및 거터 영역 */
+.monaco-editor .margin {
+  background-color: transparent !important;
+  border-right: none !important;
 }
 
 /* 텍스트 선택 영역 */
@@ -45,30 +136,6 @@
   background-color: transparent !important;
 }
 
-/* 줄 번호 */
-.monaco-editor .line-numbers {
-  color: rgba(157, 165, 180, 0.6) !important;
-  font-size: 14px !important;
-  border-right: none !important;
-}
-
-/* 현재 라인의 줄 번호 강조 */
-.monaco-editor .current-line ~ .line-numbers {
-  color: #89ddff !important;
-  font-weight: 600 !important;
-}
-
-.monaco-editor .line-numbers.active-line-number {
-  color: #89ddff !important;
-  font-weight: 600 !important;
-}
-
-/* 스크롤바 */
-.monaco-editor .scrollbar .slider {
-  background-color: rgba(121, 121, 121, 0.4) !important;
-  border-radius: 4px !important;
-}
-
 /* 파라미터 힌트 */
 .monaco-editor .parameter-hints-widget {
   background-color: rgba(30, 33, 43, 0.95) !important;
@@ -87,16 +154,16 @@
   color: rgba(137, 221, 255, 0.8) !important;
 }
 
-/* 에디터 패딩 */
-.monaco-editor .monaco-scrollable-element {
-  padding: 16px 0 !important;
+/* 라이트 모드 특정 스타일 */
+.light-mode .monaco-editor {
+  background-color: #ffffff !important;
 }
 
-/* 에러 및 경고 표시 */
-.monaco-editor .squiggly-error {
-  background: rgba(255, 99, 99, 0.4) !important;
+.light-mode .monaco-editor .line-numbers {
+  color: #64748b !important;
 }
 
-.monaco-editor .squiggly-warning {
-  background: rgba(255, 204, 99, 0.4) !important;
+.light-mode .monaco-editor .current-line ~ .line-numbers,
+.light-mode .monaco-editor .line-numbers.active-line-number {
+  color: #2563eb !important;
 }

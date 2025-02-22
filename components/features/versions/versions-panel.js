@@ -1,3 +1,5 @@
+"use client";
+
 import { FaHistory } from "react-icons/fa";
 import SnapshotItem from "./snapshot-item";
 import CurrentSession from "./session";
@@ -31,7 +33,7 @@ export default function VersionsPanel({
   };
 
   return (
-    <div className="h-full p-2 flex flex-col">
+    <div className="h-full p-2 flex flex-col text-gray-800 dark:text-gray-100">
       {/* 현재 작업 중인 세션 */}
       <CurrentSession
         isActive={isCurrentSessionActive}
@@ -39,17 +41,17 @@ export default function VersionsPanel({
       />
 
       {/* 구분선 */}
-      <div className="h-px bg-gray-800 my-4" />
+      <div className="h-px bg-gray-200 dark:bg-gray-800 my-4" />
 
       {/* 스냅샷 섹션 */}
       <div className="group p-2.5 rounded-lg">
         <div className="flex items-center gap-3">
-          <div className="text-blue-400">
+          <div className="text-blue-500">
             <FaHistory size={15} />
           </div>
           <div className="flex-1 min-w-0">
-            <span className="font-medium text-blue-400">Snapshots</span>
-            <div className="text-xs text-gray-400 mt-0.5">
+            <span className="font-medium text-blue-500">Snapshots</span>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {snapshots.length} versions
             </div>
           </div>
@@ -57,10 +59,7 @@ export default function VersionsPanel({
       </div>
 
       {/* 스냅샷 리스트 */}
-      <motion.div
-        className="space-y-1 overflow-y-auto mt-2"
-        layout // 레이아웃 애니메이션 추가
-      >
+      <motion.div className="space-y-1 overflow-y-auto mt-2" layout>
         <AnimatePresence mode="popLayout" initial={false}>
           {snapshots.map((snapshot, index) => (
             <SnapshotItem
@@ -68,7 +67,7 @@ export default function VersionsPanel({
               snapshot={snapshot}
               isActive={currentVersion === index}
               onClick={() => handleSnapshotSelect(index)}
-              layoutId={`snapshot-${snapshot.id}`} // 고유 레이아웃 ID 추가
+              layoutId={`snapshot-${snapshot.id}`}
             />
           ))}
         </AnimatePresence>
