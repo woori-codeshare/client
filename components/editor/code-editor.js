@@ -4,6 +4,7 @@ import Editor from "@monaco-editor/react";
 import CreateSnapshotModal from "./create-snapshot-modal";
 import { detectLanguage } from "@/utils/detect-language";
 import "../../styles/editor-theme.css";
+import RoomUsersCount from "@/components/features/room/room-users-count";
 
 /**
  * 코드 에디터 컴포넌트
@@ -158,43 +159,48 @@ export default function CodeEditor({
   return (
     <div className="flex flex-col h-full px-2 py-2">
       {/* 헤더 영역 */}
-      <div className="flex items-center mb-4">
-        <div className="flex items-center gap-3">
-          <FaCode className="text-blue-500 dark:text-blue-400 text-2xl" />
-          <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100">
-            Code Editor
-          </h2>
-        </div>
+      <div className="flex items-center justify-between mb-4">
+        {/* 왼쪽: 제목과 버튼들 */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <FaCode className="text-blue-500 dark:text-blue-400 text-2xl" />
+            <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100">
+              Code Editor
+            </h2>
+          </div>
 
-        <div className="flex items-center gap-2 ml-4">
-          {/* 코드 복사 버튼 */}
-          <button
-            onClick={handleCopy}
-            className="p-2 text-gray-600 dark:text-gray-400 
-              hover:text-blue-500 dark:hover:text-blue-400 
-              transition-colors rounded 
-              hover:bg-gray-100 dark:hover:bg-gray-800"
-            title={copied ? "Copied" : "Copy"}
-          >
-            {copied ? <FaCheck size={14} /> : <FaCopy size={14} />}
-          </button>
-
-          {/* 스냅샷 생성 버튼 */}
-          {!isReadOnly && (
+          <div className="flex items-center gap-2">
+            {/* 코드 복사 버튼 */}
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleCopy}
               className="p-2 text-gray-600 dark:text-gray-400 
                 hover:text-blue-500 dark:hover:text-blue-400 
                 transition-colors rounded 
                 hover:bg-gray-100 dark:hover:bg-gray-800"
-              title="Snapshot"
+              title={copied ? "Copied" : "Copy"}
             >
-              <FaCamera size={14} />
+              {copied ? <FaCheck size={14} /> : <FaCopy size={14} />}
             </button>
-          )}
-        </div>
-      </div>
 
+            {/* 스냅샷 생성 버튼 */}
+            {!isReadOnly && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="p-2 text-gray-600 dark:text-gray-400 
+                  hover:text-blue-500 dark:hover:text-blue-400 
+                  transition-colors rounded 
+                  hover:bg-gray-100 dark:hover:bg-gray-800"
+                title="Snapshot"
+              >
+                <FaCamera size={14} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 우측: 참여자 수 */}
+        <RoomUsersCount />
+      </div>
       {/* Monaco 에디터 영역 */}
       <div className="flex-1 relative">
         <Editor
