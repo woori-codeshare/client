@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { FaCode, FaCopy, FaCamera, FaCheck } from "react-icons/fa";
 import Editor from "@monaco-editor/react";
@@ -5,6 +6,7 @@ import CreateSnapshotModal from "./create-snapshot-modal";
 import { detectLanguage } from "@/utils/detect-language";
 import "../../styles/editor-theme.css";
 import RoomUsersCount from "@/components/features/room/room-users-count";
+import { useWebSocket } from "@/contexts/websocket-context";
 
 /**
  * 코드 에디터 컴포넌트
@@ -18,7 +20,7 @@ import RoomUsersCount from "@/components/features/room/room-users-count";
  * @param {boolean} props.isDisabled - 비활성화 여부
  * @param {boolean} props.isSidebarOpen - 사이드바 열림 여부
  * @param {boolean} props.isRightPanelOpen - 우측 패널 열림 여부
- * @param {string} props.roomId - 방 ID
+ * @param {long} props.roomId - 방 ID
  */
 export default function CodeEditor({
   code,
@@ -32,6 +34,7 @@ export default function CodeEditor({
   isRightPanelOpen,
   roomId,
 }) {
+  const { client, connected } = useWebSocket();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [detectedLanguage, setDetectedLanguage] = useState(
@@ -62,16 +65,89 @@ export default function CodeEditor({
     [detectedLanguage]
   );
 
+  // 코드 업데이트 WebSocket 구독
+  useEffect(() => {
+    if (!client || !connected || !roomId) {
+      console.log("WebSocket not ready:", { client, connected, roomId });
+      return;
+    }
+
+    try {
+      console.log("Subscribing to code updates for room:", roomId);
+      const subscription = client.subscribe(
+        `/topic/room/${roomId}/code`,
+        (message) => {
+          try {
+            const data = JSON.parse(message.body);
+            console.log("Received code update:", data);
+            if (data.eventType === "UPDATE" && data.code !== code) {
+              console.log("Updating code...");
+              onCodeChange(data.code);
+            }
+          } catch (error) {
+            console.error("Failed to parse code update:", error);
+          }
+        }
+      );
+
+      return () => {
+        console.log("Unsubscribing from code updates");
+        if (subscription) {
+          subscription.unsubscribe();
+        }
+      };
+    } catch (error) {
+      console.error("WebSocket subscription error:", error);
+    }
+  }, [client, connected, roomId, onCodeChange, code]);
+
   // 코드 변경 핸들러
   const handleCodeChange = useCallback(
     (newCode) => {
+      if (newCode === code) return; // 같은 코드면 무시
       onCodeChange(newCode);
+
+      // WebSocket을 통해 코드 변경 전송
+      if (client && connected && roomId && !isReadOnly) {
+        try {
+          console.log("Publishing code update:", {
+            roomId,
+            codeLength: newCode.length,
+          });
+
+          client.publish({
+            destination: "/app/update.code",
+            body: JSON.stringify({
+              roomId: parseInt(roomId, 10),
+              code: newCode,
+            }),
+          });
+        } catch (error) {
+          console.error("Failed to send code update:", error);
+        }
+      } else {
+        console.log("Cannot send update:", {
+          client: !!client,
+          connected,
+          roomId,
+          isReadOnly,
+        });
+      }
+
       if (!language) {
-        // 디바운스 없이 바로 실행
         debouncedDetectLanguage(newCode);
       }
     },
-    [language, onCodeChange, debouncedDetectLanguage]
+    [
+      client,
+      connected,
+      roomId,
+      code,
+      language,
+      onCodeChange,
+      debouncedDetectLanguage,
+      isReadOnly,
+    ]
   );
 
   // 초기 언어 감지 및 코드 변경 시 언어 감지
@@ -133,7 +209,7 @@ export default function CodeEditor({
       setIsDark(isDarkMode);
       if (editorRef.current) {
         editorRef.current.updateOptions({
-          theme: isDarkMode ? "vs-dark" : "vs"
+          theme: isDarkMode ? "vs-dark" : "vs",
         });
       }
     };
@@ -202,7 +278,6 @@ export default function CodeEditor({
 
         {/* 우측: 참여자 수 */}
         <RoomUsersCount roomId={roomId} />
-
       </div>
       {/* Monaco 에디터 영역 */}
       <div className="flex-1 relative">
@@ -246,7 +321,7 @@ export default function CodeEditor({
             automaticLayout: true,
             lineNumbers: "on",
             readOnly: isDisabled || isReadOnly,
-            fontFamily: "Monaco, 'Courier New', monospace"
+            fontFamily: "Monaco, 'Courier New', monospace",
           }}
           className={`rounded-lg border ${
             isDark ? "border-gray-800" : "border-gray-200"
