@@ -18,6 +18,7 @@ import RoomUsersCount from "@/components/features/room/room-users-count";
  * @param {boolean} props.isDisabled - 비활성화 여부
  * @param {boolean} props.isSidebarOpen - 사이드바 열림 여부
  * @param {boolean} props.isRightPanelOpen - 우측 패널 열림 여부
+ * @param {string} props.roomId - 방 ID
  */
 export default function CodeEditor({
   code,
@@ -29,6 +30,7 @@ export default function CodeEditor({
   isDisabled,
   isSidebarOpen,
   isRightPanelOpen,
+  roomId,
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -199,7 +201,8 @@ export default function CodeEditor({
         </div>
 
         {/* 우측: 참여자 수 */}
-        <RoomUsersCount />
+        <RoomUsersCount roomId={roomId} />
+
       </div>
       {/* Monaco 에디터 영역 */}
       <div className="flex-1 relative">

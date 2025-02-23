@@ -22,6 +22,7 @@ export default function CodeShareRoomPage() {
   // Room state
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [showEnterModal, setShowEnterModal] = useState(false);
+  const [roomInfo, setRoomInfo] = useState(null);
 
   // Editor state
   const [code, setCode] = useState(desanitizeCode(INITIAL_CODE));
@@ -53,6 +54,14 @@ export default function CodeShareRoomPage() {
 
     checkAccess();
   }, [id, showAlert]);
+
+  // 초기 roomInfo 로드
+  useEffect(() => {
+    const room = RoomStorage.getRoom(id);
+    if (room) {
+      setRoomInfo(room);
+    }
+  }, [id]);
 
   // 스냅샷 데이터 초기 로딩
   useEffect(() => {
@@ -115,7 +124,7 @@ export default function CodeShareRoomPage() {
       };
 
       RoomStorage.saveRoom(roomInfo);
-
+      setRoomInfo(roomInfo);
       showAlert("방에 입장하는데 성공하였습니다.", "success");
       setIsAuthorized(true);
       setShowEnterModal(false);
@@ -255,7 +264,7 @@ export default function CodeShareRoomPage() {
         onSnapshotsUpdate={handleSnapshotsUpdate}
         currentVersion={currentVersion}
         onVersionChange={handleVersionChange}
-        roomId={id}
+        roomId={roomInfo?.roomId}
         snapshotId={
           currentVersion !== null ? snapshots[currentVersion]?.id : null
         }

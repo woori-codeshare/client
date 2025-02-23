@@ -1,6 +1,7 @@
 import "./globals.css";
 import Header from "../components/layout/header";
 import { AlertProvider } from "@/contexts/alert-context";
+import { WebSocketProvider } from "@/contexts/websocket-context";
 
 export const metadata = {
   title: "Woori-CodeShare",
@@ -41,10 +42,12 @@ export default function RootLayout({ children }) {
         className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-hidden"
         suppressHydrationWarning
       >
-        <AlertProvider>
-          <Header />
-          {children}
-        </AlertProvider>
+        <WebSocketProvider>
+          <AlertProvider>
+            <Header />
+            {children}
+          </AlertProvider>
+        </WebSocketProvider>
       </body>
     </html>
   );

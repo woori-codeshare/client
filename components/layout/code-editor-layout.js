@@ -137,6 +137,7 @@ export default function CodeEditorLayout({
             isSidebarOpen={isSidebarOpen}
             isRightPanelOpen={!!activePanel}
             isReadOnly={isReadOnly}
+            roomId={roomId}
           />
         </div>
       </div>
