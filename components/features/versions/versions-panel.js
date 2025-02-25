@@ -22,7 +22,7 @@ export default function VersionsPanel({
 
   /**
    * 저장된 스냅샷으로 전환
-   * @param {number} index - 선택할 스냅샷 인덱스
+   * @param {number} index - 사용자가 선택한 스냅샷 인덱스
    */
   const switchToSnapshot = (index) => {
     setCurrentVersion(index);
@@ -46,7 +46,7 @@ export default function VersionsPanel({
       {/* 구분선 */}
       <div className="h-px bg-gray-200 dark:bg-gray-800 my-4" />
 
-      {/* 스냅샷 섹션 */}
+      {/* 스냅샷 헤더 */}
       <div className="group p-2.5 rounded-lg">
         <div className="flex items-center gap-3">
           <div className="text-blue-500">
