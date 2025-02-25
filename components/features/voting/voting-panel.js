@@ -1,7 +1,42 @@
+import { useState } from "react";
 import { FaVoteYea } from "react-icons/fa";
+import { useAlert } from "@/contexts/alert-context";
 
 // 학습 내용 이해도를 체크하기 위한 투표 패널 컴포넌트
-export default function VotingPanel() {
+export default function VotingPanel({ roomId, snapshotId }) {
+  const { showAlert } = useAlert();
+  const [loading, setLoading] = useState(false);
+  const [userVote, setUserVote] = useState(null);
+
+  const handleVote = async (voteType) => {
+    if (loading || userVote) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/votes/${snapshotId}/cast`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ voteType }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("투표에 실패했습니다.");
+      }
+
+      setUserVote(voteType);
+      showAlert("투표가 완료되었습니다.", "success");
+    } catch (error) {
+      showAlert(error.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     // 메인 패널 컨테이너
     <div
@@ -18,9 +53,6 @@ export default function VotingPanel() {
             <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
               Active Vote
             </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              4 votes total
-            </p>
           </div>
         </div>
       </div>
@@ -32,27 +64,45 @@ export default function VotingPanel() {
         </p>
         {/* 긍정적 응답 버튼 */}
         <button
-          className="w-full bg-green-50 dark:bg-green-500/10 hover:bg-green-100 dark:hover:bg-green-500/20 p-3 rounded-lg 
-          transition-colors border border-green-200 dark:border-green-500/20 text-left text-sm flex items-center justify-between text-green-600 dark:text-green-400"
+          onClick={() => handleVote("POSITIVE")}
+          disabled={loading || userVote}
+          className={`w-full bg-green-50 dark:bg-green-500/10 hover:bg-green-100 dark:hover:bg-green-500/20 p-3 rounded-lg 
+          transition-colors border border-green-200 dark:border-green-500/20 text-left text-sm flex items-center justify-between text-green-600 dark:text-green-400
+          ${userVote === "POSITIVE" ? "ring-2 ring-green-500" : ""}
+          ${
+            loading || (userVote && userVote !== "POSITIVE") ? "opacity-50" : ""
+          }`}
         >
           <span>O 이해했습니다</span>
-          <span className="text-xs opacity-75">3 votes</span>
+          {userVote === "POSITIVE" && <span className="text-xs">✓ 투표함</span>}
         </button>
         {/* 중립적 응답 버튼 */}
         <button
-          className="w-full bg-yellow-50 dark:bg-yellow-500/10 hover:bg-yellow-100 dark:hover:bg-yellow-500/20 p-3 rounded-lg 
-          transition-colors border border-yellow-200 dark:border-yellow-500/20 text-left text-sm flex items-center justify-between text-yellow-600 dark:text-yellow-400"
+          onClick={() => handleVote("NEUTRAL")}
+          disabled={loading || userVote}
+          className={`w-full bg-yellow-50 dark:bg-yellow-500/10 hover:bg-yellow-100 dark:hover:bg-yellow-500/20 p-3 rounded-lg 
+          transition-colors border border-yellow-200 dark:border-yellow-500/20 text-left text-sm flex items-center justify-between text-yellow-600 dark:text-yellow-400
+          ${userVote === "NEUTRAL" ? "ring-2 ring-yellow-500" : ""}
+          ${
+            loading || (userVote && userVote !== "NEUTRAL") ? "opacity-50" : ""
+          }`}
         >
           <span>△ 조금 더 설명이 필요합니다</span>
-          <span className="text-xs opacity-75">1 vote</span>
+          {userVote === "NEUTRAL" && <span className="text-xs">✓ 투표함</span>}
         </button>
         {/* 부정적 응답 버튼 */}
         <button
-          className="w-full bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 p-3 rounded-lg 
-          transition-colors border border-red-200 dark:border-red-500/20 text-left text-sm flex items-center justify-between text-red-600 dark:text-red-400"
+          onClick={() => handleVote("NEGATIVE")}
+          disabled={loading || userVote}
+          className={`w-full bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 p-3 rounded-lg 
+          transition-colors border border-red-200 dark:border-red-500/20 text-left text-sm flex items-center justify-between text-red-600 dark:text-red-400
+          ${userVote === "NEGATIVE" ? "ring-2 ring-red-500" : ""}
+          ${
+            loading || (userVote && userVote !== "NEGATIVE") ? "opacity-50" : ""
+          }`}
         >
           <span>✕ 전혀 이해하지 못했습니다</span>
-          <span className="text-xs opacity-75">0 votes</span>
+          {userVote === "NEGATIVE" && <span className="text-xs">✓ 투표함</span>}
         </button>
       </div>
     </div>

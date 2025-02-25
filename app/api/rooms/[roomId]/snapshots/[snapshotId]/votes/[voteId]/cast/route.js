@@ -12,7 +12,7 @@ import { NextResponse } from "next/server";
  */
 export async function POST(request, { params }) {
   try {
-    const { voteId } = params;
+    const { voteId } = await params;
     const body = await request.json();
     const { voteType } = body;
 
