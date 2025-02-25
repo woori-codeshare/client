@@ -37,7 +37,7 @@ export default function CreateSnapshotModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} allowBackdropClose={false}>
+    <Modal isOpen={isOpen} onClose={onClose}>
       {/* 모달 제목 */}
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-4">
         Create Snapshot

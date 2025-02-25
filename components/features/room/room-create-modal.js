@@ -21,6 +21,7 @@ export default function RoomCreateModal({
       onClose={onClose}
       allowBackdropClose={false}
       preventEscClose={preventEscClose}
+      closeButton={false}
     >
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-4">
         Create Room

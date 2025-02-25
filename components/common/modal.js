@@ -16,7 +16,7 @@ export default function Modal({
   onClose,
   children,
   allowBackdropClose = true,
-  closeButton = false,
+  closeButton = true,
   preventEscClose = false,
 }) {
   // ESC 키를 눌렀을 때 모달을 닫는 이벤트 핸들러 등록
