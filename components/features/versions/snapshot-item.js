@@ -3,12 +3,16 @@ import { motion } from "framer-motion";
 import { formatRelativeTime } from "@/utils/formatters";
 
 /**
- * 개별 스냅샷 항목을 표시하는 컴포넌트
- * @param {Object} props
- * @param {Object} props.snapshot - 스냅샷 데이터 객체 (제목, 설명, 타임스탬프 포함)
- * @param {boolean} props.isActive - 현재 선택된 스냅샷 여부
- * @param {Function} props.onClick - 스냅샷 클릭 시 실행될 핸들러 함수
- * @param {string} props.layoutId - 레이아웃 애니메이션을 위한 ID
+ * 코드 스냅샷 아이템을 표시하는 컴포넌트
+ * @param {Object} props 컴포넌트 속성
+ * @param {Object} props.snapshot - 스냅샷 정보 객체
+ * @param {string} props.snapshot.id - 스냅샷의 고유 식별자
+ * @param {string} props.snapshot.title - 스냅샷 제목
+ * @param {string} props.snapshot.description - 스냅샷 설명 (선택적)
+ * @param {string|number} props.snapshot.createdAt - 스냅샷 생성 시간
+ * @param {boolean} props.isActive - 현재 선택된 스냅샷인지 여부
+ * @param {Function} props.onClick - 스냅샷 클릭 시 호출할 핸들러 함수
+ * @param {string} props.layoutId - framer-motion 애니메이션을 위한 레이아웃 ID
  */
 export default function SnapshotItem({
   snapshot,
@@ -24,9 +28,9 @@ export default function SnapshotItem({
    * 스냅샷의 타임스탬프가 변경될 때마다 새로운 함수 생성 방지를 위해 useCallback 사용
    */
   const updateTime = useCallback(() => {
-    if (!snapshot?.timestamp) return;
-    setFormattedTime(formatRelativeTime(snapshot.timestamp));
-  }, [snapshot?.timestamp]);
+    if (!snapshot?.createdAt) return;
+    setFormattedTime(formatRelativeTime(snapshot.createdAt));
+  }, [snapshot?.createdAt]);
 
   /**
    * 컴포넌트 마운트 시 시간 포맷팅 시작
