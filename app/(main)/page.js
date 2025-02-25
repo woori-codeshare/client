@@ -42,7 +42,6 @@ export default function CreateRoomPage() {
         uuid: data.data.uuid,
         roomId: data.data.roomId,
         title: title,
-        isCreator: true,
         isAuthorized: true,
       };
 

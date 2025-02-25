@@ -119,7 +119,6 @@ export default function CodeShareRoomPage() {
         uuid: id,
         roomId: data.data.roomId,
         title: data.data.title,
-        isCreator: false,
         isAuthorized: true,
       };
 
