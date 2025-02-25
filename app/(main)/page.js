@@ -5,21 +5,20 @@ import CodeEditorLayout from "@/components/layout/code-editor-layout";
 import { INITIAL_CODE } from "@/constants/initial-data";
 import RoomCreateModal from "@/components/features/room/room-create-modal";
 import { useRouter } from "next/navigation";
-import { INITIAL_WIDTHS, PANEL_CONFIGS } from "@/constants/panel-config";
 import { RoomStorage } from "@/utils/room-storage";
 import { useAlert } from "@/contexts/alert-context";
 
 /**
- * 방 생성 페이지
- * 새로운 코드 공유 방을 생성하는 페이지 컴포넌트
+ * 방 생성 페이지 (Room Creation Page)
+ *
+ * 이 페이지는 사용자가 새로운 코드 공유방을 생성할 수 있는 기능을 제공합니다.
+ * 페이지 접속 시 방 생성 모달이 자동으로 표시되며, 사용자는 방 제목과 비밀번호를
+ * 입력하여 새로운 방을 생성할 수 있습니다.
  */
 export default function CreateRoomPage() {
   const router = useRouter();
   const { showAlert } = useAlert();
   const [showCreateModal, setShowCreateModal] = useState(true);
-  const [code, setCode] = useState(INITIAL_CODE);
-  const [activePanel, setActivePanel] = useState(PANEL_CONFIGS.QUESTIONS.id);
-  const [rightWidth] = useState(INITIAL_WIDTHS.RIGHT);
 
   const handleCreateRoom = async (title, password) => {
     try {
@@ -63,17 +62,10 @@ export default function CreateRoomPage() {
         className={showCreateModal ? "filter blur-sm pointer-events-none" : ""}
       >
         <CodeEditorLayout
-          code={code}
-          onCodeChange={setCode}
+          code={INITIAL_CODE}
           isDisabled={showCreateModal}
           isSidebarOpen={false}
-          onSidebarToggle={() => {}} // 비활성화된 상태
-          rightWidth={rightWidth}
-          activePanel={activePanel}
-          onPanelChange={setActivePanel}
           snapshots={[]}
-          currentVersion={null}
-          onVersionChange={() => {}}
         />
       </div>
 
