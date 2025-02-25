@@ -1,23 +1,11 @@
-/**
- * 방 참가자 관리를 위한 API 라우트
- */
-
 import { NextResponse } from "next/server";
 
 /**
- * 방 참가 요청을 처리합니다.
- *
- * @param {Request} request - HTTP 요청 객체
- * @param {Object} params - URL 매개변수
- * @param {string} params.roomId - 방 UUID
- * @returns {Promise<NextResponse>} JSON 응답
- *
- * @throws {Error} 비밀번호가 일치하지 않는 경우
- * @throws {Error} 서버 에러 발생 시
+ * 방 참가 요청
  */
 export async function POST(request, { params }) {
   try {
-    const { roomId } = params;
+    const { roomId } = await params;
     const { searchParams } = new URL(request.url);
     const password = searchParams.get("password");
 

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+/**
+ * 방 생성 요청
+ */
 export async function POST(request) {
   try {
     const body = await request.json();

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+/**
+ * 댓글 수정 요청
+ */
 export async function PATCH(request, { params }) {
   try {
     const { commentId } = await params;
@@ -43,6 +46,9 @@ export async function PATCH(request, { params }) {
   }
 }
 
+/**
+ * 댓글 삭제 요청
+ */
 export async function DELETE(request, { params }) {
   try {
     const { commentId } = await params;
