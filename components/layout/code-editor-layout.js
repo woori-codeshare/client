@@ -1,11 +1,12 @@
 "use client";
 
 import { FaQuestion, FaVoteYea, FaHistory } from "react-icons/fa";
-import CodeEditor from "@/components/editor/code-editor";
 import ResizeHandle from "@/components/common/resize-handle";
 import VersionsPanel from "@/components/features/versions/versions-panel";
 import QuestionsPanel from "@/components/features/questions/questions-panel";
 import VotingPanel from "@/components/features/voting/voting-panel";
+import SnapshotEditor from "@/components/editor/snapshot-editor";
+import CurrentSessionEditor from "@/components/editor/current-session-editor";
 
 /**
  * 코드 에디터 레이아웃 컴포넌트
@@ -51,6 +52,30 @@ export default function CodeEditorLayout({
   snapshotId,
   onSnapshotsUpdate,
 }) {
+  const renderEditor = () => {
+    if (isReadOnly) {
+      return (
+        <SnapshotEditor
+          code={code}
+          isSidebarOpen={isSidebarOpen}
+          isRightPanelOpen={!!activePanel}
+        />
+      );
+    } else {
+      return (
+        <CurrentSessionEditor
+          code={code}
+          onCodeChange={onCodeChange}
+          isDisabled={isDisabled}
+          onCreateSnapshot={onCreateSnapshot}
+          isSidebarOpen={isSidebarOpen}
+          isRightPanelOpen={!!activePanel}
+          roomId={roomId}
+        />
+      );
+    }
+  };
+
   const renderActivePanel = () => {
     switch (activePanel) {
       case "comments":
@@ -129,16 +154,7 @@ export default function CodeEditorLayout({
       {/* 메인 컨텐츠 (코드 에디터) */}
       <div className="flex-1 h-full min-w-[300px] relative p-2 overflow-hidden bg-gray-50 dark:bg-gray-900">
         <div className="h-full rounded-lg overflow-hidden">
-          <CodeEditor
-            code={code}
-            onCodeChange={onCodeChange}
-            isDisabled={isDisabled}
-            onCreateSnapshot={onCreateSnapshot}
-            isSidebarOpen={isSidebarOpen}
-            isRightPanelOpen={!!activePanel}
-            isReadOnly={isReadOnly}
-            roomId={roomId}
-          />
+          {renderEditor()}
         </div>
       </div>
 
