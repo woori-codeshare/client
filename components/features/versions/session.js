@@ -3,12 +3,12 @@
 import { GoBroadcast } from "react-icons/go";
 
 /**
- * 현재 작업 중인 코드 세션을 표시하는 컴포넌트
+ * 실시간 코드 공유 세션으로 전환하는 버튼 컴포넌트
  * @param {Object} props
- * @param {boolean} props.isActive - 현재 활성화된 상태 여부
- * @param {function} props.onClick - 클릭 이벤트 핸들러
+ * @param {boolean} props.isActive - 라이브 세션이 현재 활성화되어 있는지 여부 (활성화 되어 있지 않은 경우: 스냅샷을 선택한 경우)
+ * @param {function} props.onClick - 라이브 세션으로 전환하는 클릭 이벤트 핸들러
  */
-export default function CurrentSession({ isActive = true, onClick }) {
+export default function LiveSessionButton({ isActive = true, onClick }) {
   return (
     <div className="overflow-hidden rounded-lg relative">
       {/* 스포트라이트 레이어 */}
