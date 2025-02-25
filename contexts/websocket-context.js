@@ -8,6 +8,7 @@ const WebSocketContext = createContext(null);
 export function WebSocketProvider({ children }) {
   const [client, setClient] = useState(null);
   const [connected, setConnected] = useState(false);
+  const [nickname, setNickname] = useState(null);
 
   useEffect(() => {
     const stompClient = new Client({
@@ -53,7 +54,9 @@ export function WebSocketProvider({ children }) {
   }, []);
 
   return (
-    <WebSocketContext.Provider value={{ client, connected }}>
+    <WebSocketContext.Provider
+      value={{ client, connected, nickname, setNickname }}
+    >
       {children}
     </WebSocketContext.Provider>
   );
