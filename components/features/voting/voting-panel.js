@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaVoteYea } from "react-icons/fa";
 import { useAlert } from "@/contexts/alert-context";
 
@@ -7,6 +7,32 @@ export default function VotingPanel({ roomId, snapshotId }) {
   const { showAlert } = useAlert();
   const [loading, setLoading] = useState(false);
   const [userVote, setUserVote] = useState(null);
+  const [voteResults, setVoteResults] = useState(null);
+
+  // 투표 결과 조회
+  const fetchVoteResults = async () => {
+    try {
+      const response = await fetch(
+        `/api/rooms/${roomId}/snapshots/${snapshotId}/votes/${snapshotId}`
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
+
+      setVoteResults(data.data.voteCounts);
+    } catch (error) {
+      console.error("투표 결과 조회 실패:", error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 및 투표 완료 후 결과 조회
+  useEffect(() => {
+    if (snapshotId) {
+      fetchVoteResults();
+    }
+  }, [snapshotId, userVote]);
 
   const handleVote = async (voteType) => {
     if (loading || userVote) return;
@@ -30,11 +56,23 @@ export default function VotingPanel({ roomId, snapshotId }) {
 
       setUserVote(voteType);
       showAlert("투표가 완료되었습니다.", "success");
+      await fetchVoteResults(); // 투표 후 결과 즉시 갱신
     } catch (error) {
       showAlert(error.message, "error");
     } finally {
       setLoading(false);
     }
+  };
+
+  // 전체 투표 수 계산
+  const totalVotes = voteResults
+    ? Object.values(voteResults).reduce((a, b) => a + b, 0)
+    : 0;
+
+  // 투표 비율 계산 함수
+  const getVotePercentage = (count) => {
+    if (!totalVotes) return 0;
+    return Math.round((count / totalVotes) * 100);
   };
 
   return (
@@ -53,6 +91,11 @@ export default function VotingPanel({ roomId, snapshotId }) {
             <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
               Active Vote
             </h2>
+            {totalVotes > 0 && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {totalVotes} votes total
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -74,7 +117,11 @@ export default function VotingPanel({ roomId, snapshotId }) {
           }`}
         >
           <span>O 이해했습니다</span>
-          {userVote === "POSITIVE" && <span className="text-xs">✓ 투표함</span>}
+          <span className="text-xs opacity-75">
+            {voteResults?.POSITIVE || 0} votes
+            {totalVotes > 0 &&
+              ` (${getVotePercentage(voteResults?.POSITIVE)}%)`}
+          </span>
         </button>
         {/* 중립적 응답 버튼 */}
         <button
@@ -88,7 +135,10 @@ export default function VotingPanel({ roomId, snapshotId }) {
           }`}
         >
           <span>△ 조금 더 설명이 필요합니다</span>
-          {userVote === "NEUTRAL" && <span className="text-xs">✓ 투표함</span>}
+          <span className="text-xs opacity-75">
+            {voteResults?.NEUTRAL || 0} votes
+            {totalVotes > 0 && ` (${getVotePercentage(voteResults?.NEUTRAL)}%)`}
+          </span>
         </button>
         {/* 부정적 응답 버튼 */}
         <button
@@ -102,7 +152,11 @@ export default function VotingPanel({ roomId, snapshotId }) {
           }`}
         >
           <span>✕ 전혀 이해하지 못했습니다</span>
-          {userVote === "NEGATIVE" && <span className="text-xs">✓ 투표함</span>}
+          <span className="text-xs opacity-75">
+            {voteResults?.NEGATIVE || 0} votes
+            {totalVotes > 0 &&
+              ` (${getVotePercentage(voteResults?.NEGATIVE)}%)`}
+          </span>
         </button>
       </div>
     </div>
