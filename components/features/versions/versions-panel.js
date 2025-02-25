@@ -2,48 +2,51 @@
 
 import { FaHistory } from "react-icons/fa";
 import SnapshotItem from "./snapshot-item";
-import CurrentSession from "./session";
+import LiveSessionButton from "./live-session-button";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
- * 스냅샷 목록을 관리하고 표시하는 컴포넌트
+ * 코드 스냅샷 기록과 라이브 세션 선택을 관리하는 패널 컴포넌트
  * @param {Object} props
- * @param {Array} props.snapshots - 스냅샷 배열
- * @param {number} props.currentVersion - 현재 선택된 버전 인덱스
- * @param {Function} props.setCurrentVersion - 버전 변경 함수
+ * @param {Array} props.snapshots - 저장된 코드 스냅샷 배열
+ * @param {number|null} props.currentVersion - 현재 선택된 스냅샷 인덱스 (null일 경우 라이브 세션)
+ * @param {Function} props.setCurrentVersion - 버전 변경 상태 업데이트 함수
  */
 export default function VersionsPanel({
   snapshots,
   currentVersion,
   setCurrentVersion,
 }) {
-  // 현재 작업 중인 세션인지 여부 (스냅샷을 선택하지 않은 상태)
-  const isCurrentSessionActive = currentVersion === null;
+  // 현재 라이브 세션 활성화 여부 (스냅샷을 선택하지 않은 상태)
+  const isLiveSessionActive = currentVersion === null;
 
   /**
-   * 스냅샷 버전 변경 처리
-   * @param {number} index - 선택된 스냅샷 인덱스
+   * 저장된 스냅샷으로 전환
+   * @param {number} index - 사용자가 선택한 스냅샷 인덱스
    */
-  const handleSnapshotSelect = (index) => {
+  const switchToSnapshot = (index) => {
     setCurrentVersion(index);
   };
 
-  const handleCurrentSessionSelect = () => {
+  /**
+   * 라이브 코딩 세션으로 전환
+   */
+  const switchToLiveSession = () => {
     setCurrentVersion(null);
   };
 
   return (
     <div className="h-full p-2 flex flex-col text-gray-800 dark:text-gray-100">
-      {/* 현재 작업 중인 세션 */}
-      <CurrentSession
-        isActive={isCurrentSessionActive}
-        onClick={handleCurrentSessionSelect}
+      {/* 라이브 코딩 세션 버튼 */}
+      <LiveSessionButton
+        isActive={isLiveSessionActive}
+        onClick={switchToLiveSession}
       />
 
       {/* 구분선 */}
       <div className="h-px bg-gray-200 dark:bg-gray-800 my-4" />
 
-      {/* 스냅샷 섹션 */}
+      {/* 스냅샷 헤더 */}
       <div className="group p-2.5 rounded-lg">
         <div className="flex items-center gap-3">
           <div className="text-blue-500">
@@ -66,7 +69,7 @@ export default function VersionsPanel({
               key={snapshot.id}
               snapshot={snapshot}
               isActive={currentVersion === index}
-              onClick={() => handleSnapshotSelect(index)}
+              onClick={() => switchToSnapshot(index)}
               layoutId={`snapshot-${snapshot.id}`}
             />
           ))}

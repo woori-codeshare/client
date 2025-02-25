@@ -10,7 +10,7 @@ export default function RoomEnterModal({ isOpen, onClose, onSubmit }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} allowBackdropClose={false}>
+    <Modal isOpen={isOpen} onClose={onClose} allowBackdropClose={false} closeButton={false}>
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-4">
         Enter Room
       </h2>

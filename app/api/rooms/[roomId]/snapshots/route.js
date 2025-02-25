@@ -1,15 +1,7 @@
-/**
- * 코드 스냅샷 관리를 위한 API 라우트
- */
-
 import { NextResponse } from "next/server";
 
 /**
- * 코드 스냅샷 조회 요청을 처리합니다.
- *
- * @param {Request} request - HTTP 요청 객체
- * @param {Object} params - 라우트 파라미터
- * @returns {Promise<NextResponse>} JSON 응답
+ * 코드 스냅샷 조회 요청
  */
 export async function GET(request, { params }) {
   try {
@@ -49,13 +41,7 @@ export async function GET(request, { params }) {
 }
 
 /**
- * 코드 스냅샷 생성 요청을 처리합니다.
- *
- * @param {Request} request - HTTP 요청 객체
- * @returns {Promise<NextResponse>} JSON 응답
- *
- * @throws {Error} 필수 데이터 누락 시
- * @throws {Error} 서버 에러 발생 시
+ * 코드 스냅샷 생성 요청
  */
 export async function POST(request) {
   try {

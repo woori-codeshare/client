@@ -78,12 +78,12 @@ export default function CodeShareRoomPage() {
         const formattedSnapshots = data.data
           .map((snapshot) => ({
             id: snapshot.snapshotId,
-            timestamp: new Date(snapshot.createdAt),
+            createdAt: new Date(snapshot.createdAt),
             title: snapshot.title,
             description: snapshot.description,
             code: snapshot.code,
           }))
-          .sort((a, b) => b.timestamp - a.timestamp); // 날짜 기준 내림차순 정렬
+          .sort((a, b) => b.createdAt - a.createdAt); // 날짜 기준 내림차순 정렬
 
         setSnapshots(formattedSnapshots);
       } catch (error) {
@@ -119,7 +119,6 @@ export default function CodeShareRoomPage() {
         uuid: id,
         roomId: data.data.roomId,
         title: data.data.title,
-        isCreator: false,
         isAuthorized: true,
       };
 
@@ -207,7 +206,7 @@ export default function CodeShareRoomPage() {
 
       const newSnapshot = {
         id: data.data.snapshotId,
-        timestamp: new Date(data.data.createdAt),
+        createdAt: new Date(data.data.createdAt),
         title: data.data.title,
         description: data.data.description,
         code: data.data.code,

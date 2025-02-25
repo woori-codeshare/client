@@ -1,14 +1,7 @@
 import { NextResponse } from "next/server";
 
 /**
- * 투표 진행 요청을 처리합니다.
- *
- * @param {Request} request - HTTP 요청 객체
- * @param {Object} params - URL 매개변수
- * @param {string} params.roomId - 방 ID
- * @param {string} params.snapshotId - 스냅샷 ID
- * @param {string} params.voteId - 투표 ID
- * @returns {Promise<NextResponse>} JSON 응답
+ * 투표 진행 요청
  */
 export async function POST(request, { params }) {
   try {

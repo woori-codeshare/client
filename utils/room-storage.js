@@ -32,7 +32,6 @@ export const RoomStorage = {
    * @param {string} roomInfo.uuid - 방의 고유 식별자
    * @param {number} roomInfo.roomId - 방의 ID
    * @param {string} roomInfo.title - 방 제목
-   * @param {boolean} roomInfo.isCreator - 현재 사용자가 방장인지 여부
    * @param {boolean} [roomInfo.isAuthorized=false] - 인증된 사용자인지 여부
    */
   saveRoom(roomInfo) {
@@ -41,21 +40,10 @@ export const RoomStorage = {
       uuid: roomInfo.uuid,
       roomId: roomInfo.roomId,
       title: roomInfo.title,
-      isCreator: roomInfo.isCreator || false,
-      isAuthorized: roomInfo.isAuthorized || roomInfo.isCreator || false,
+      isAuthorized: roomInfo.isAuthorized || false,
       lastAccessed: new Date().toISOString(),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(rooms));
-  },
-
-  /**
-   * 현재 사용자가 특정 방의 방장인지 확인합니다.
-   * @param {string} uuid - 확인할 방의 UUID
-   * @returns {boolean} 방장 여부
-   */
-  isCreator(uuid) {
-    const room = this.getRoom(uuid);
-    return room?.isCreator || false;
   },
 
   /**
@@ -65,6 +53,6 @@ export const RoomStorage = {
    */
   hasAccess(uuid) {
     const room = this.getRoom(uuid);
-    return room?.isCreator || room?.isAuthorized || false;
+    return room?.isAuthorized || false;
   },
 };

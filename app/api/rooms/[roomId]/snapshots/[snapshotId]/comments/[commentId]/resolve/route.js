@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+/**
+ * 댓글 해결 상태 변경 요청
+ */
 export async function PATCH(request, { params }) {
   try {
     const { commentId } = await params;

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+/**
+ * 댓글 조회 요청
+ */
 export async function GET(request, { params }) {
   try {
     const { snapshotId } = await params;
@@ -17,8 +20,8 @@ export async function GET(request, { params }) {
 
     if (!response.ok) {
       return NextResponse.json(
-          { error: data.errorMessage || "댓글 조회에 실패했습니다." },
-          { status: response.status }
+        { error: data.errorMessage || "댓글 조회에 실패했습니다." },
+        { status: response.status }
       );
     }
 
@@ -30,12 +33,15 @@ export async function GET(request, { params }) {
     console.error("댓글 조회 중 에러가 발생했습니다:", error);
 
     return NextResponse.json(
-        { error: "서버 에러가 발생했습니다." },
-        { status: 500 }
+      { error: "서버 에러가 발생했습니다." },
+      { status: 500 }
     );
   }
 }
 
+/**
+ * 질문/댓글 작성 요청
+ */
 export async function POST(request, { params }) {
   try {
     const { snapshotId } = await params;
@@ -77,7 +83,6 @@ export async function POST(request, { params }) {
       message: successMessage,
       data: data.data,
     });
-
   } catch (error) {
     console.error("질문/댓글 작성 중 에러가 발생했습니다:", error);
 

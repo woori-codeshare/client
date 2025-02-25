@@ -27,12 +27,12 @@ export default function VotingPanel({ roomId, snapshotId }) {
     }
   };
 
-  // 컴포넌트 마운트 시 및 투표 완료 후 결과 조회
+  // 컴포넌트 마운트 시 투표 결과 조회
   useEffect(() => {
     if (snapshotId) {
       fetchVoteResults();
     }
-  }, [snapshotId, userVote]);
+  }, [snapshotId]);
 
   const handleVote = async (voteType) => {
     if (loading || userVote) return;
@@ -55,8 +55,13 @@ export default function VotingPanel({ roomId, snapshotId }) {
       }
 
       setUserVote(voteType);
+      setVoteResults((prevResults) => {
+        const updatedResults = { ...prevResults };
+        updatedResults[voteType] = (updatedResults[voteType] || 0) + 1;
+        return updatedResults;
+      });
+
       showAlert("투표가 완료되었습니다.", "success");
-      await fetchVoteResults(); // 투표 후 결과 즉시 갱신
     } catch (error) {
       showAlert(error.message, "error");
     } finally {
@@ -76,7 +81,6 @@ export default function VotingPanel({ roomId, snapshotId }) {
   };
 
   return (
-    // 메인 패널 컨테이너
     <div
       className="panel p-4 rounded-lg 
       bg-white dark:bg-gray-900
@@ -105,6 +109,7 @@ export default function VotingPanel({ roomId, snapshotId }) {
         <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
           현재 내용을 이해하셨나요?
         </p>
+
         {/* 긍정적 응답 버튼 */}
         <button
           onClick={() => handleVote("POSITIVE")}
@@ -123,6 +128,7 @@ export default function VotingPanel({ roomId, snapshotId }) {
               ` (${getVotePercentage(voteResults?.POSITIVE)}%)`}
           </span>
         </button>
+
         {/* 중립적 응답 버튼 */}
         <button
           onClick={() => handleVote("NEUTRAL")}
@@ -140,6 +146,7 @@ export default function VotingPanel({ roomId, snapshotId }) {
             {totalVotes > 0 && ` (${getVotePercentage(voteResults?.NEUTRAL)}%)`}
           </span>
         </button>
+
         {/* 부정적 응답 버튼 */}
         <button
           onClick={() => handleVote("NEGATIVE")}
