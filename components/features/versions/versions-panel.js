@@ -2,7 +2,7 @@
 
 import { FaHistory } from "react-icons/fa";
 import SnapshotItem from "./snapshot-item";
-import LiveSessionButton from "./session";
+import LiveSessionButton from "./live-session-button";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
