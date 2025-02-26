@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Woori-CodeShare
 
-## Getting Started
+Woori-CodeShare는 강사님의 코드를 실시간으로 공유하고, 스냅샷하여 우리에프아이에스 아카데미 수강생들의 보다 더 나은 수업을 위해 기획된 프로젝트에요.
 
-First, run the development server:
+## 주요 기능
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. 사용자는 방을 생성하거나, 기존 방에 참여할 수 있어요.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ![방 생성](docs/create-room.png)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+   ![방 참여](docs/join-room.png)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+2. 방에 참여한 사용자는 강사님의 코드를 실시간으로 공유받을 수 있어요.
 
-To learn more about Next.js, take a look at the following resources:
+   ![코드 공유](docs/share-code.gif)
+   [youtube](https://youtu.be/xZoLT4L6aOQ)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. 사용자는 코드를 스냅샷하여, 나중에 다시 볼 수 있어요.
 
-## Deploy on Vercel
+   ![코드 스냅샷](docs/snapshot-code.gif)
+   [youtube](https://youtu.be/iJhQ_TBRRoE)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. 사용자는 해당 코드가 이해가 되지 않은 경우, 질문을 남길 수 있어요.
+
+   ![질문하기](docs/ask-question.gif)
+   [youtube](https://youtu.be/dMl7eJKyKDE)
+
+
+5. 사용자는 해당 코드에 대한 이해도를 표시할 수 있어요.
+
+   ![이해도 표시](docs/vote-difficulty.gif)
+   [youtube](https://youtu.be/C8i-QXpfRqY)
