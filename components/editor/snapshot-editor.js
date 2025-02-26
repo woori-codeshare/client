@@ -11,6 +11,7 @@ import "../../styles/editor-theme.css";
  */
 export default function SnapshotEditor({
   code,
+  title,
   snapshotInfo,
   isSidebarOpen,
   isRightPanelOpen,
@@ -96,7 +97,7 @@ export default function SnapshotEditor({
           <div className="flex items-center gap-3">
             <FaHistory className="text-blue-500 dark:text-blue-400 text-2xl" />
             <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100">
-              Snapshot: {snapshotInfo?.title || "Untitled"}
+              Snapshot: {title}
             </h2>
           </div>
 
