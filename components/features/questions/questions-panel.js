@@ -5,6 +5,16 @@ import { FaQuestion, FaPaperPlane } from "react-icons/fa";
 import MessageItem from "./message-item";
 import { useAlert } from "@/contexts/alert-context";
 
+const POLLING_INTERVAL = 1000; // 질문/답변 조회 폴링 간격 (1초)
+
+// 폴링을 위한 커스텀 훅
+function useInterval(callback, delay) {
+  useEffect(() => {
+    const intervalId = setInterval(callback, delay);
+    return () => clearInterval(intervalId);
+  }, [callback, delay]);
+}
+
 /**
  * 질문과 답변을 관리하는 패널 컴포넌트
  * @param {string} roomId - 현재 룸의 고유 식별자
@@ -102,19 +112,14 @@ export default function QuestionsPanel({
     if (!snapshotId) return;
 
     try {
-      console.log("Fetching comments for:", { roomId, snapshotId });
-
       const response = await fetch(
         `/api/rooms/${roomId}/snapshots/${snapshotId}/comments`
       );
 
-      console.log("Response status:", response.status);
       const data = await response.json();
-      console.log("Comments API response:", data);
 
       if (!response.ok) {
-        console.error("Comments API error:", data);
-        showAlert(data.error || "댓글 조회에 실패했습니다.", "error");
+        console.error("Comments fetch error:", data);
         return;
       }
 
@@ -125,18 +130,26 @@ export default function QuestionsPanel({
             comment.parentCommentId === null ? 0 : comment.parentCommentId,
         }))
       );
-      console.log("Organized messages:", organizedMessages);
-      setMessages(organizedMessages);
+
+      if (JSON.stringify(messages) !== JSON.stringify(organizedMessages)) {
+        setMessages(organizedMessages);
+      }
     } catch (error) {
       console.error("Comments fetch error:", error);
-      showAlert("댓글 조회 중 오류가 발생했습니다.", "error");
     }
-  }, [roomId, snapshotId, showAlert]);
+  }, [roomId, snapshotId]);
 
   // 스냅샷이 변경될 때마다 댓글 목록 조회
   useEffect(() => {
     fetchComments();
   }, [fetchComments]);
+
+  // Add polling for comments
+  useInterval(() => {
+    if (snapshotId) {
+      fetchComments();
+    }
+  }, POLLING_INTERVAL);
 
   /**
    * 스냅샷의 댓글 목록을 업데이트하는 함수
