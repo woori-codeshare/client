@@ -31,7 +31,7 @@ export default function CodeShareRoomPage() {
 
   // Layout state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activePanel, setActivePanel] = useState(PANEL_CONFIGS.QUESTIONS.id);
+  const [activePanel, setActivePanel] = useState(null);
   const [leftWidth, setLeftWidth] = useState(INITIAL_WIDTHS.LEFT);
   const [rightWidth, setRightWidth] = useState(INITIAL_WIDTHS.RIGHT);
 
@@ -199,7 +199,6 @@ export default function CodeShareRoomPage() {
     if (snapshots[index]) {
       setCode(desanitizeCode(snapshots[index].code));
       setCurrentVersion(index);
-      setActivePanel(PANEL_CONFIGS.QUESTIONS.id); // 스냅샷으로 전환 시 자동으로 질문 패널 열기
     }
   };
 
