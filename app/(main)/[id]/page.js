@@ -63,39 +63,6 @@ export default function CodeShareRoomPage() {
     }
   }, [id]);
 
-  // 스냅샷 데이터 초기 로딩
-  useEffect(() => {
-    const fetchSnapshots = async () => {
-      try {
-        const response = await fetch(`/api/rooms/${id}/snapshots`);
-        const data = await response.json();
-
-        if (!response.ok) {
-          showAlert(data.error || "스냅샷 조회에 실패했습니다.", "error");
-          return;
-        }
-
-        const formattedSnapshots = data.data
-          .map((snapshot) => ({
-            id: snapshot.snapshotId,
-            createdAt: new Date(snapshot.createdAt),
-            title: snapshot.title,
-            description: snapshot.description,
-            code: snapshot.code,
-          }))
-          .sort((a, b) => b.createdAt - a.createdAt); // 날짜 기준 내림차순 정렬
-
-        setSnapshots(formattedSnapshots);
-      } catch (error) {
-        showAlert("스냅샷 조회 중 오류가 발생했습니다.", "error");
-      }
-    };
-
-    if (isAuthorized) {
-      fetchSnapshots();
-    }
-  }, [id, isAuthorized, showAlert]);
-
   /**
    * 방 입장 처리
    */
@@ -263,6 +230,7 @@ export default function CodeShareRoomPage() {
         onSnapshotsUpdate={handleSnapshotsUpdate}
         currentVersion={currentVersion}
         onVersionChange={handleVersionChange}
+        roomUuid={roomInfo?.uuid}
         roomId={roomInfo?.roomId}
         snapshotId={
           currentVersion !== null ? snapshots[currentVersion]?.id : null
