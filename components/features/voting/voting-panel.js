@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { FaVoteYea } from "react-icons/fa";
 import { useAlert } from "@/contexts/alert-context";
 
-const POLLING_INTERVAL = 3000; // 3초마다 폴링
+const POLLING_INTERVAL = 1000; // 1초마다 폴링
 
 const VOTE_TYPES = {
   POSITIVE: {
@@ -70,10 +70,27 @@ export default function VotingPanel({ roomId, snapshotId }) {
     }
   }, [roomId, snapshotId]);
 
-  // 초기 데이터 로드
+  // Storage Event 리스너 추가
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === `vote_${snapshotId}` && e.newValue) {
+        setUserVote(JSON.parse(e.newValue));
+        fetchVoteResults(); // 투표 결과도 함께 갱신
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [snapshotId, fetchVoteResults]);
+
+  // 초기 데이터 로드 및 이전 투표 확인
   useEffect(() => {
     if (snapshotId) {
       fetchVoteResults();
+      const previousVote = localStorage.getItem(`vote_${snapshotId}`);
+      if (previousVote) {
+        setUserVote(JSON.parse(previousVote));
+      }
     }
   }, [snapshotId, fetchVoteResults]);
 
@@ -82,6 +99,13 @@ export default function VotingPanel({ roomId, snapshotId }) {
 
   const handleVote = async (voteType) => {
     if (loading || userVote) return;
+
+    // 이전 투표 이력 확인
+    const previousVote = localStorage.getItem(`vote_${snapshotId}`);
+    if (previousVote) {
+      showAlert("이미 투표하셨습니다.", "error");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -100,12 +124,11 @@ export default function VotingPanel({ roomId, snapshotId }) {
         throw new Error("투표에 실패했습니다.");
       }
 
+      // 투표 성공 시 로컬 스토리지에 저장
+      localStorage.setItem(`vote_${snapshotId}`, JSON.stringify(voteType));
+
       setUserVote(voteType);
-      setVoteResults((prevResults) => {
-        const updatedResults = { ...prevResults };
-        updatedResults[voteType] = (updatedResults[voteType] || 0) + 1;
-        return updatedResults;
-      });
+      await fetchVoteResults(); // 투표 후 즉시 결과 갱신
 
       showAlert("투표가 완료되었습니다.", "success");
     } catch (error) {
