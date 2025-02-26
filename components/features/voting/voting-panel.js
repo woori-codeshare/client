@@ -1,6 +1,48 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { FaVoteYea } from "react-icons/fa";
 import { useAlert } from "@/contexts/alert-context";
+
+const POLLING_INTERVAL = 3000; // 3초마다 폴링
+
+const VOTE_TYPES = {
+  POSITIVE: {
+    text: "O 이해했습니다",
+    styles: {
+      bg: "bg-green-50 dark:bg-green-500/10",
+      hover: "hover:bg-green-100 dark:hover:bg-green-500/20",
+      border: "border-green-200 dark:border-green-500/20",
+      text: "text-green-600 dark:text-green-400",
+      ring: "ring-green-500",
+    },
+  },
+  NEUTRAL: {
+    text: "△ 조금 더 설명이 필요합니다",
+    styles: {
+      bg: "bg-yellow-50 dark:bg-yellow-500/10",
+      hover: "hover:bg-yellow-100 dark:hover:bg-yellow-500/20",
+      border: "border-yellow-200 dark:border-yellow-500/20",
+      text: "text-yellow-600 dark:text-yellow-400",
+      ring: "ring-yellow-500",
+    },
+  },
+  NEGATIVE: {
+    text: "✕ 전혀 이해하지 못했습니다",
+    styles: {
+      bg: "bg-red-50 dark:bg-red-500/10",
+      hover: "hover:bg-red-100 dark:hover:bg-red-500/20",
+      border: "border-red-200 dark:border-red-500/20",
+      text: "text-red-600 dark:text-red-400",
+      ring: "ring-red-500",
+    },
+  },
+};
+
+function useInterval(callback, delay) {
+  useEffect(() => {
+    const intervalId = setInterval(callback, delay);
+    return () => clearInterval(intervalId);
+  }, [callback, delay]);
+}
 
 // 학습 내용 이해도를 체크하기 위한 투표 패널 컴포넌트
 export default function VotingPanel({ roomId, snapshotId }) {
@@ -9,8 +51,9 @@ export default function VotingPanel({ roomId, snapshotId }) {
   const [userVote, setUserVote] = useState(null);
   const [voteResults, setVoteResults] = useState(null);
 
-  // 투표 결과 조회
-  const fetchVoteResults = async () => {
+  const fetchVoteResults = useCallback(async () => {
+    if (!snapshotId) return;
+
     try {
       const response = await fetch(
         `/api/rooms/${roomId}/snapshots/${snapshotId}/votes/${snapshotId}`
@@ -25,14 +68,17 @@ export default function VotingPanel({ roomId, snapshotId }) {
     } catch (error) {
       console.error("투표 결과 조회 실패:", error);
     }
-  };
+  }, [roomId, snapshotId]);
 
-  // 컴포넌트 마운트 시 투표 결과 조회
+  // 초기 데이터 로드
   useEffect(() => {
     if (snapshotId) {
       fetchVoteResults();
     }
-  }, [snapshotId]);
+  }, [snapshotId, fetchVoteResults]);
+
+  // 폴링 설정
+  useInterval(fetchVoteResults, POLLING_INTERVAL);
 
   const handleVote = async (voteType) => {
     if (loading || userVote) return;
@@ -110,61 +156,30 @@ export default function VotingPanel({ roomId, snapshotId }) {
           현재 내용을 이해하셨나요?
         </p>
 
-        {/* 긍정적 응답 버튼 */}
-        <button
-          onClick={() => handleVote("POSITIVE")}
-          disabled={loading || userVote}
-          className={`w-full bg-green-50 dark:bg-green-500/10 hover:bg-green-100 dark:hover:bg-green-500/20 p-3 rounded-lg 
-          transition-colors border border-green-200 dark:border-green-500/20 text-left text-sm flex items-center justify-between text-green-600 dark:text-green-400
-          ${userVote === "POSITIVE" ? "ring-2 ring-green-500" : ""}
-          ${
-            loading || (userVote && userVote !== "POSITIVE") ? "opacity-50" : ""
-          }`}
-        >
-          <span>O 이해했습니다</span>
-          <span className="text-xs opacity-75">
-            {voteResults?.POSITIVE || 0} votes
-            {totalVotes > 0 &&
-              ` (${getVotePercentage(voteResults?.POSITIVE)}%)`}
-          </span>
-        </button>
-
-        {/* 중립적 응답 버튼 */}
-        <button
-          onClick={() => handleVote("NEUTRAL")}
-          disabled={loading || userVote}
-          className={`w-full bg-yellow-50 dark:bg-yellow-500/10 hover:bg-yellow-100 dark:hover:bg-yellow-500/20 p-3 rounded-lg 
-          transition-colors border border-yellow-200 dark:border-yellow-500/20 text-left text-sm flex items-center justify-between text-yellow-600 dark:text-yellow-400
-          ${userVote === "NEUTRAL" ? "ring-2 ring-yellow-500" : ""}
-          ${
-            loading || (userVote && userVote !== "NEUTRAL") ? "opacity-50" : ""
-          }`}
-        >
-          <span>△ 조금 더 설명이 필요합니다</span>
-          <span className="text-xs opacity-75">
-            {voteResults?.NEUTRAL || 0} votes
-            {totalVotes > 0 && ` (${getVotePercentage(voteResults?.NEUTRAL)}%)`}
-          </span>
-        </button>
-
-        {/* 부정적 응답 버튼 */}
-        <button
-          onClick={() => handleVote("NEGATIVE")}
-          disabled={loading || userVote}
-          className={`w-full bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 p-3 rounded-lg 
-          transition-colors border border-red-200 dark:border-red-500/20 text-left text-sm flex items-center justify-between text-red-600 dark:text-red-400
-          ${userVote === "NEGATIVE" ? "ring-2 ring-red-500" : ""}
-          ${
-            loading || (userVote && userVote !== "NEGATIVE") ? "opacity-50" : ""
-          }`}
-        >
-          <span>✕ 전혀 이해하지 못했습니다</span>
-          <span className="text-xs opacity-75">
-            {voteResults?.NEGATIVE || 0} votes
-            {totalVotes > 0 &&
-              ` (${getVotePercentage(voteResults?.NEGATIVE)}%)`}
-          </span>
-        </button>
+        {Object.entries(VOTE_TYPES).map(([type, config]) => (
+          <button
+            key={type}
+            onClick={() => handleVote(type)}
+            disabled={loading || userVote}
+            className={`w-full ${config.styles.bg} ${
+              config.styles.hover
+            } p-3 rounded-lg 
+            transition-colors border ${
+              config.styles.border
+            } text-left text-sm flex items-center justify-between ${
+              config.styles.text
+            }
+            ${userVote === type ? `ring-2 ${config.styles.ring}` : ""}
+            ${loading || (userVote && userVote !== type) ? "opacity-50" : ""}`}
+          >
+            <span>{config.text}</span>
+            <span className="text-xs opacity-75">
+              {voteResults?.[type] || 0} votes
+              {totalVotes > 0 &&
+                ` (${getVotePercentage(voteResults?.[type])}%)`}
+            </span>
+          </button>
+        ))}
       </div>
     </div>
   );
