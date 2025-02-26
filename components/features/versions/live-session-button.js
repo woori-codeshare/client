@@ -61,11 +61,8 @@ export default function LiveSessionButton({ isActive = true, onClick }) {
                 }
               `}
               >
-                Current Session
+                Live Session
               </span>
-              <div className="text-xs mt-0.5 text-gray-500 dark:text-gray-400">
-                Live editing mode
-              </div>
             </div>
           </div>
         </div>

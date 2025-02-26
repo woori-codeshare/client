@@ -229,7 +229,7 @@ export default function CurrentSessionEditor({
           <div className="flex items-center gap-3">
             <FaCode className="text-blue-500 dark:text-blue-400 text-2xl" />
             <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100">
-              Live Editor
+              Live Session
             </h2>
           </div>
 
