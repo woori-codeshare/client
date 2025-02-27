@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useCallback } from "react";
 import { FaVoteYea } from "react-icons/fa";
 import { useAlert } from "@/contexts/alert-context";
@@ -51,8 +53,25 @@ export default function VotingPanel({ roomId, snapshotId }) {
   const [userVote, setUserVote] = useState(null);
   const [voteResults, setVoteResults] = useState(null);
 
+  // snapshotId가 변경될 때마다 상태 초기화
+  useEffect(() => {
+    setUserVote(null);
+    setVoteResults(null);
+
+    // 새로운 스냅샷의 이전 투표 확인
+    if (snapshotId) {
+      const previousVote = localStorage.getItem(`vote_${snapshotId}`);
+      if (previousVote) {
+        setUserVote(JSON.parse(previousVote));
+      }
+    }
+  }, [snapshotId]);
+
   const fetchVoteResults = useCallback(async () => {
-    if (!snapshotId) return;
+    if (!snapshotId) {
+      setVoteResults(null);
+      return;
+    }
 
     try {
       const response = await fetch(
@@ -67,6 +86,7 @@ export default function VotingPanel({ roomId, snapshotId }) {
       setVoteResults(data.data.voteCounts);
     } catch (error) {
       console.error("투표 결과 조회 실패:", error);
+      setVoteResults(null);
     }
   }, [roomId, snapshotId]);
 
@@ -85,14 +105,8 @@ export default function VotingPanel({ roomId, snapshotId }) {
 
   // 초기 데이터 로드 및 이전 투표 확인
   useEffect(() => {
-    if (snapshotId) {
-      fetchVoteResults();
-      const previousVote = localStorage.getItem(`vote_${snapshotId}`);
-      if (previousVote) {
-        setUserVote(JSON.parse(previousVote));
-      }
-    }
-  }, [snapshotId, fetchVoteResults]);
+    fetchVoteResults();
+  }, [fetchVoteResults, snapshotId]);
 
   // 폴링 설정
   useInterval(fetchVoteResults, POLLING_INTERVAL);
