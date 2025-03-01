@@ -1,5 +1,7 @@
 export const INITIAL_CODE = `
-function example() {
-    console.log("Hello, CodeShare!");
+public class Example {
+    public static void main(String[] args) {
+        System.out.println("Hello, CodeShare!");
+    }
 }
 `.trim();
