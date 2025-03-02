@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import CodeEditorLayout from "@/components/layout/code-editor-layout";
-import { INITIAL_CODE } from "@/constants/initial-data";
-import RoomCreateModal from "@/components/features/room/room-create-modal";
 import { useRouter } from "next/navigation";
+import RoomCreateModal from "@/components/features/room/room-create-modal";
 import { RoomStorage } from "@/utils/room-storage";
 import { useAlert } from "@/contexts/alert-context";
+import MockCodeEditorLayout from "@/components/layout/mock-code-editor-layout";
 
 /**
  * 방 생성 페이지 (Room Creation Page)
@@ -60,12 +59,7 @@ export default function CreateRoomPage() {
       <div
         className={showCreateModal ? "filter blur-sm pointer-events-none" : ""}
       >
-        <CodeEditorLayout
-          code={INITIAL_CODE}
-          isDisabled={showCreateModal}
-          isSidebarOpen={false}
-          snapshots={[]}
-        />
+        <MockCodeEditorLayout />
       </div>
 
       <RoomCreateModal
