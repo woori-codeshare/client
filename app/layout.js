@@ -67,12 +67,10 @@ export default function RootLayout({ children }) {
         className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-hidden"
         suppressHydrationWarning
       >
-        <WebSocketProvider>
-          <AlertProvider>
-            <Header />
-            {children}
-          </AlertProvider>
-        </WebSocketProvider>
+        <AlertProvider>
+          <Header />
+          {children}
+        </AlertProvider>
       </body>
     </html>
   );
