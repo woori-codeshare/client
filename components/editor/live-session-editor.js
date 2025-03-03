@@ -12,7 +12,7 @@ import { useWebSocket } from "@/contexts/websocket-context";
 /**
  * 실시간 세션용 코드 에디터 컴포넌트
  */
-export default function CurrentSessionEditor({
+export default function LiveSessionEditor({
   code,
   onCodeChange,
   onCreateSnapshot,

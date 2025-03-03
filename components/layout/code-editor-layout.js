@@ -6,7 +6,7 @@ import VersionsPanel from "@/components/features/versions/versions-panel";
 import QuestionsPanel from "@/components/features/questions/questions-panel";
 import VotingPanel from "@/components/features/voting/voting-panel";
 import SnapshotEditor from "@/components/editor/snapshot-editor";
-import CurrentSessionEditor from "@/components/editor/current-session-editor";
+import LiveSessionEditor from "@/components/editor/live-session-editor";
 
 /**
  * 코드 에디터 레이아웃 컴포넌트
@@ -66,7 +66,7 @@ export default function CodeEditorLayout({
       );
     } else {
       return (
-        <CurrentSessionEditor
+        <LiveSessionEditor
           code={code}
           onCodeChange={onCodeChange}
           isDisabled={isDisabled}
