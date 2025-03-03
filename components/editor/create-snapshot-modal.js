@@ -1,6 +1,9 @@
 import { useState } from "react";
 import Modal from "../common/modal";
 
+const MAX_TITLE_LENGTH = 100;
+const MAX_DESCRIPTION_LENGTH = 255;
+
 /**
  * 스냅샷 생성을 위한 모달 컴포넌트
  * @param {Object} props
@@ -16,6 +19,30 @@ export default function CreateSnapshotModal({
   // 스냅샷 입력 폼 상태 관리
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [titleError, setTitleError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
+
+  const handleTitleChange = (e) => {
+    const newTitle = e.target.value;
+    if (newTitle.length <= MAX_TITLE_LENGTH) {
+      setTitle(newTitle);
+      setTitleError("");
+    } else {
+      setTitleError(`제목은 ${MAX_TITLE_LENGTH}자를 초과할 수 없습니다.`);
+    }
+  };
+
+  const handleDescriptionChange = (e) => {
+    const newDescription = e.target.value;
+    if (newDescription.length <= MAX_DESCRIPTION_LENGTH) {
+      setDescription(newDescription);
+      setDescriptionError("");
+    } else {
+      setDescriptionError(
+        `설명은 ${MAX_DESCRIPTION_LENGTH}자를 초과할 수 없습니다.`
+      );
+    }
+  };
 
   /**
    * 스냅샷 생성 제출 처리
@@ -25,6 +52,13 @@ export default function CreateSnapshotModal({
     e.preventDefault();
     if (!title) return;
 
+    if (
+      title.length > MAX_TITLE_LENGTH ||
+      description.length > MAX_DESCRIPTION_LENGTH
+    ) {
+      return;
+    }
+
     onCreateSnapshot({
       title,
       description,
@@ -33,28 +67,34 @@ export default function CreateSnapshotModal({
     // 폼 초기화 및 모달 닫기
     setTitle("");
     setDescription("");
+    setTitleError("");
+    setDescriptionError("");
     onClose();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      {/* 모달 제목 */}
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-4">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-6">
         Create Snapshot
       </h2>
 
-      {/* 스냅샷 생성 폼 */}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* 제목 입력 필드 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Title
-          </label>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Title
+            </label>
+            <span className="text-xs text-gray-400">
+              {title.length}/{MAX_TITLE_LENGTH}
+            </span>
+          </div>
           <input
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2
+            onChange={handleTitleChange}
+            maxLength={MAX_TITLE_LENGTH}
+            className="w-full px-3 py-2.5
               bg-white dark:bg-gray-800 
               border border-gray-300 dark:border-gray-700
               text-gray-900 dark:text-gray-200
@@ -65,31 +105,42 @@ export default function CreateSnapshotModal({
             required
             autoFocus
           />
+          {titleError && (
+            <p className="text-xs text-red-500 mt-1">{titleError}</p>
+          )}
         </div>
 
         {/* 설명 입력 필드 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Description
-          </label>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Description
+            </label>
+            <span className="text-xs text-gray-400">
+              {description.length}/{MAX_DESCRIPTION_LENGTH}
+            </span>
+          </div>
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-3 py-2
+            onChange={handleDescriptionChange}
+            maxLength={MAX_DESCRIPTION_LENGTH}
+            className="w-full px-3 py-2.5
               bg-white dark:bg-gray-800
               border border-gray-300 dark:border-gray-700
               text-gray-900 dark:text-gray-200
               focus:ring-2 focus:ring-blue-500/20
               focus:border-blue-500/50
               rounded-lg transition-colors
-              h-24 resize-none"
+              h-32 resize-none"
             placeholder="Enter snapshot description"
           />
+          {descriptionError && (
+            <p className="text-xs text-red-500 mt-1">{descriptionError}</p>
+          )}
         </div>
 
         {/* 버튼 그룹 */}
-        <div className="flex justify-end gap-2">
-          {/* 취소 버튼 */}
+        <div className="flex justify-end gap-3 pt-2">
           <button
             type="button"
             onClick={onClose}
@@ -103,15 +154,14 @@ export default function CreateSnapshotModal({
             Cancel
           </button>
 
-          {/* 스냅샷 생성 버튼 */}
           <button
             type="submit"
+            disabled={!!titleError || !!descriptionError}
             className="px-4 py-2 rounded-lg
-              bg-blue-50 hover:bg-blue-100
-              dark:bg-blue-500/20 dark:hover:bg-blue-500/30
-              text-blue-600 dark:text-blue-400
-              border border-blue-200 dark:border-blue-500/20
-              transition-colors"
+              bg-blue-500 hover:bg-blue-600
+              text-white
+              transition-colors
+              disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Create
           </button>
