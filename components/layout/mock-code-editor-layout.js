@@ -1,22 +1,45 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import { FaCode, FaHistory, FaQuestion, FaVoteYea } from "react-icons/fa";
 import { INITIAL_CODE } from "@/constants/initial-data";
+import "@/styles/editor-theme.css";
 
 export default function MockCodeEditorLayout() {
   const [isDark, setIsDark] = useState(false);
   const editorRef = useRef(null);
 
-  const updateTheme = useCallback(() => {
-    const isDarkMode = document.documentElement.classList.contains("dark");
-    setIsDark(isDarkMode);
-    if (editorRef.current) {
-      editorRef.current.updateOptions({
-        theme: isDarkMode ? "vs-dark" : "vs",
+  // 다크모드 감지 및 업데이트
+  useEffect(() => {
+    const updateTheme = () => {
+      const isDarkMode = document.documentElement.classList.contains("dark");
+      setIsDark(isDarkMode);
+      if (editorRef.current) {
+        editorRef.current.updateOptions({
+          theme: isDarkMode ? "vs-dark" : "vs",
+        });
+      }
+    };
+
+    // 초기 테마 설정
+    updateTheme();
+
+    // MutationObserver로 html 클래스 변경 감지
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          updateTheme();
+        }
       });
-    }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -54,20 +77,41 @@ export default function MockCodeEditorLayout() {
                 language="java"
                 value={INITIAL_CODE}
                 theme={isDark ? "vs-dark" : "vs"}
+                beforeMount={(monaco) => {
+                  monaco.editor.addKeybindingRule({
+                    keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF,
+                    command: null,
+                  });
+                }}
                 options={{
                   readOnly: true,
                   minimap: { enabled: false },
                   fontSize: 14,
-                  lineNumbers: "on",
+                  tabSize: 2,
+                  padding: { top: 16, bottom: 16 },
                   scrollBeyondLastLine: false,
                   wordWrap: "on",
-                  padding: { top: 16, bottom: 16 },
                   contextmenu: false,
+                  lineNumbers: "on",
+                  folding: true,
+                  foldingStrategy: "indentation",
+                  automaticLayout: true,
+                  fontFamily: "Monaco, 'Courier New', monospace",
                 }}
                 onMount={(editor, monaco) => {
                   editorRef.current = editor;
-                  updateTheme();
+                  const isDarkMode =
+                    document.documentElement.classList.contains("dark");
+                  setIsDark(isDarkMode);
+                  editor.updateOptions({
+                    theme: isDarkMode ? "vs-dark" : "vs",
+                    foreground: isDarkMode ? "#E4E4E7" : "#1F2937",
+                    background: isDarkMode ? "#18181B" : "#FFFFFF",
+                  });
                 }}
+                className={`rounded-lg border ${
+                  isDark ? "border-gray-800" : "border-gray-200"
+                } shadow-sm`}
               />
             </div>
           </div>
