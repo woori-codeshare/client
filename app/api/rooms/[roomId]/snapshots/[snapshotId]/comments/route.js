@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 export async function GET(request, { params }) {
   try {
     const { snapshotId } = await params;
-    console.log("댓글 조회 요청...");
+    // console.log("댓글 조회 요청...");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(`${API_URL}/api/v1/comments/${snapshotId}`, {
@@ -16,7 +16,7 @@ export async function GET(request, { params }) {
     });
 
     const data = await response.json();
-    console.log("댓글 조회 결과:", data);
+    // console.log("댓글 조회 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
@@ -47,7 +47,7 @@ export async function POST(request, { params }) {
     const { snapshotId } = await params;
     const body = await request.json();
 
-    console.log("질문/댓글 작성 요청...");
+    // console.log("질문/댓글 작성 요청...");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(
@@ -65,7 +65,7 @@ export async function POST(request, { params }) {
     );
 
     const data = await response.json();
-    console.log("질문/댓글 작성 요청 결과:", data);
+    // console.log("질문/댓글 작성 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(

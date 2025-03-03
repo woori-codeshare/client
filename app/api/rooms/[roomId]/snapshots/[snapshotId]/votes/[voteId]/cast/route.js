@@ -18,7 +18,7 @@ export async function POST(request, { params }) {
       );
     }
 
-    console.log(`투표 진행 요청...`);
+    // console.log(`투표 진행 요청...`);
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(`${API_URL}/api/v1/votes/${voteId}/cast`, {
@@ -31,7 +31,7 @@ export async function POST(request, { params }) {
     });
 
     const data = await response.json();
-    console.log("투표 진행 결과:", data);
+    // console.log("투표 진행 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(

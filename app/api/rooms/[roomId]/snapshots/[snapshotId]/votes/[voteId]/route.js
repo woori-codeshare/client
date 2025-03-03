@@ -7,7 +7,7 @@ export async function GET(request, { params }) {
   try {
     const { voteId } = await params;
 
-    console.log("투표 결과 조회 요청...");
+    // console.log("투표 결과 조회 요청...");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(`${API_URL}/api/v1/votes/${voteId}/results`, {
@@ -17,7 +17,7 @@ export async function GET(request, { params }) {
     });
 
     const data = await response.json();
-    console.log("투표 결과 조회 요청 결과:", data);
+    // console.log("투표 결과 조회 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
