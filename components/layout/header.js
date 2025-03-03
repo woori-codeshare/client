@@ -14,7 +14,6 @@ export default function Header() {
             width={40}
             height={40}
             priority
-            className="rounded-full"
           />
           <Image
             src="/img/woori-codeshare.png"
