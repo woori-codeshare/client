@@ -1,0 +1,77 @@
+name: AWS CI/CD Pipeline
+
+on:
+  release:
+    types: [ published ]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+  deploy-to-ec2:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Get Github Actions IP
+        id: ip
+        uses: haythem/public-ip@v1.3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Add GitHub Actions IP to Security group
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.AWS_HARUHANA_FRONTEND_INSTANCE_SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      - name: SSH into EC2 and Deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.AWS_HARUHANA_FRONTEND_INSTANCE_IP }}
+          username: ${{ secrets.AWS_HARUHANA_FRONTEND_INSTANCE_USER }}
+          key: ${{ secrets.AWS_HARUHANA_FRONTEND_INSTANCE_SSH_KEY }}
+          port: 22
+          script: |
+            git pull origin main
+            cd client
+            echo ${{ secrets.ENV }} > .env
+            npm install
+            npm run build
+            pm2 restart all
+
+      - name: Remove GitHub Actions IP from Security group
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.AWS_HARUHANA_BACKEND_INSTANCE_SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
