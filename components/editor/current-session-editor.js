@@ -6,7 +6,7 @@ import Editor from "@monaco-editor/react";
 import CreateSnapshotModal from "./create-snapshot-modal";
 import { detectLanguage } from "@/utils/detect-language";
 import "../../styles/editor-theme.css";
-import RoomUsersCount from "@/components/features/room/room-users-count";
+// import RoomUsersCount from "@/components/features/room/room-users-count";
 import { useWebSocket } from "@/contexts/websocket-context";
 
 /**
@@ -263,7 +263,7 @@ export default function CurrentSessionEditor({
         </div>
 
         {/* 우측: 참여자 수 */}
-        <RoomUsersCount roomId={roomId} />
+        {/*<RoomUsersCount roomId={roomId} />*/}
       </div>
 
       {/* Monaco 에디터 영역 */}
