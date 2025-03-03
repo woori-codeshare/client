@@ -8,7 +8,7 @@ export async function PATCH(request, { params }) {
     const { commentId } = await params;
     const body = await request.json();
 
-    console.log("댓글 해결 상태 변경 요청...");
+    // console.log("댓글 해결 상태 변경 요청...");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(
@@ -23,7 +23,7 @@ export async function PATCH(request, { params }) {
     );
 
     const data = await response.json();
-    console.log("댓글 해결 상태 변경 요청 결과:", data);
+    // console.log("댓글 해결 상태 변경 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
