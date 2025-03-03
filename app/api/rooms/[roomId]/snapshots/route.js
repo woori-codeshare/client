@@ -7,7 +7,7 @@ export async function GET(request, { params }) {
   try {
     const { roomId } = await params;
 
-    console.log("스냅샷 조회 요청...");
+    // console.log("스냅샷 조회 요청...");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(`${API_URL}/api/v1/snapshots/${roomId}/`, {
@@ -17,7 +17,7 @@ export async function GET(request, { params }) {
     });
 
     const data = await response.json();
-    console.log("스냅샷 조회 결과:", data);
+    // console.log("스냅샷 조회 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
@@ -48,7 +48,7 @@ export async function POST(request) {
     const body = await request.json();
     const { roomId, title, description, code } = body;
 
-    console.log("스냅샷 생성 요청...");
+    // console.log("스냅샷 생성 요청...");
 
     const requestBody = { title, description, code };
 
@@ -63,7 +63,7 @@ export async function POST(request) {
     });
 
     const data = await response.json();
-    console.log("스냅샷 생성 결과:", data);
+    // console.log("스냅샷 생성 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(

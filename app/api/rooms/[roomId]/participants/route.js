@@ -9,7 +9,7 @@ export async function POST(request, { params }) {
     const { searchParams } = new URL(request.url);
     const password = searchParams.get("password");
 
-    console.log("방 참가 요청...");
+    // console.log("방 참가 요청...");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(
@@ -20,7 +20,7 @@ export async function POST(request, { params }) {
     );
 
     const data = await response.json();
-    console.log("방 참가 요청 결과:", data);
+    // console.log("방 참가 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
