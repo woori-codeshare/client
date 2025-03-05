@@ -7,7 +7,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
 
-    console.log("방 생성 요청...");
+    // console.log("방 생성 요청...");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(`${API_URL}/api/v1/rooms/new`, {
@@ -19,7 +19,7 @@ export async function POST(request) {
     });
 
     const data = await response.json();
-    console.log("방 생성 요청 결과:", data);
+    // console.log("방 생성 요청 결과:", data);
 
     if (!response.ok) {
       return NextResponse.json(
