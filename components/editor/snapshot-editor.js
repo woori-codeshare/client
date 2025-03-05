@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FaHistory, FaCopy, FaCheck, FaCode } from "react-icons/fa";
-import Editor from "@monaco-editor/react";
+import { FaHistory, FaCopy, FaCheck, FaInfoCircle } from "react-icons/fa";
 import { detectLanguage } from "@/utils/detect-language";
 import "../../styles/editor-theme.css";
+import { DarkReadonlyEditor, LightReadonlyEditor } from "./variants";
 
 /**
  * 스냅샷 전용 코드 에디터 컴포넌트 (읽기 전용)
@@ -12,7 +12,7 @@ import "../../styles/editor-theme.css";
 export default function SnapshotEditor({
   code,
   title,
-  snapshotInfo,
+  description,
   isSidebarOpen,
   isRightPanelOpen,
 }) {
@@ -93,25 +93,46 @@ export default function SnapshotEditor({
       {/* 헤더 영역 */}
       <div className="flex items-center justify-between mb-4">
         {/* 왼쪽: 제목과 버튼들 */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
-            <FaHistory className="text-blue-500 dark:text-blue-400 text-2xl" />
+        <div className="flex items-center">
+          <FaHistory className="text-blue-500 dark:text-blue-400 text-2xl" />
+          <div className="flex items-center ml-3">
             <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100">
               Snapshot: {title}
             </h2>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* 코드 복사 버튼 */}
+            {description && (
+              <div className="relative group ml-2">
+                <button className="p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 transition-colors">
+                  <FaInfoCircle size={16} />
+                </button>
+                <div
+                  className="invisible opacity-0 group-hover:visible group-hover:opacity-100
+                      absolute z-50
+                      min-w-[200px] max-w-[400px]
+                      left-0 top-full mt-2
+                      bg-white dark:bg-gray-800 
+                      rounded-lg shadow-lg 
+                      border border-gray-200 dark:border-gray-700
+                      transition-all duration-200
+                      before:absolute before:w-2 before:h-2
+                      before:bg-white dark:before:bg-gray-800
+                      before:-top-1 before:left-[9px]
+                      before:border-l before:border-t
+                      before:border-gray-200 dark:before:border-gray-700
+                      before:rotate-45"
+                >
+                  <div className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 break-words whitespace-pre-wrap max-h-[120px] overflow-y-auto">
+                    {description}
+                  </div>
+                </div>
+              </div>
+            )}
             <button
               onClick={handleCopy}
-              className="p-2 text-gray-600 dark:text-gray-400
-                hover:text-blue-500 dark:hover:text-blue-400
-                transition-colors rounded
-                hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="ml-2 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400
+                transition-colors rounded"
               title={copied ? "Copied" : "Copy"}
             >
-              {copied ? <FaCheck size={14} /> : <FaCopy size={14} />}
+              {copied ? <FaCheck size={16} /> : <FaCopy size={16} />}
             </button>
           </div>
         </div>
@@ -119,75 +140,11 @@ export default function SnapshotEditor({
 
       {/* Monaco 에디터 영역 */}
       <div className="flex-1 relative">
-        <Editor
-          width="100%"
-          height="100%"
-          language={detectedLanguage}
-          value={code}
-          beforeMount={(monaco) => {
-            // ctrl+f 키 바인딩만 제거
-            monaco.editor.addKeybindingRule({
-              keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF,
-              command: null,
-            });
-          }}
-          options={{
-            theme: isDark ? "vs-dark" : "vs",
-            fontSize: 14, // 폰트 크기
-            tabSize: 2, // 탭 크기
-            padding: { top: 16, bottom: 16 },
-
-            // 자동 완성 및 힌트
-            quickSuggestions: {
-              other: true,
-              comments: false,
-              strings: false,
-            },
-            parameterHints: {
-              enabled: true,
-            },
-
-            // 에디터 기본 설정
-            folding: true,
-            foldingStrategy: "indentation",
-            wordWrap: "on",
-            links: false,
-            contextmenu: false,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            automaticLayout: true,
-            lineNumbers: "on",
-            readOnly: true,
-            fontFamily: "Monaco, 'Courier New', monospace",
-          }}
-          className={`rounded-lg border ${
-            isDark ? "border-gray-800" : "border-gray-200"
-          } shadow-sm`}
-          onMount={(editor, monaco) => {
-            editorRef.current = editor;
-            // 에디터 마운트 시 검색 관련 커맨드 제거
-            editor.addCommand(
-              monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_F,
-              () => {
-                // do nothing
-              }
-            );
-            // 초기 마운트 시 레이아웃 조정
-            setTimeout(() => {
-              editor.layout();
-            }, 100);
-            // 마운트 시 초기 테마 적용
-            editor.updateOptions({
-              theme: isDark ? "vs-dark" : "vs",
-              foreground: isDark ? "#E4E4E7" : "#1F2937",
-              background: isDark ? "#18181B" : "#FFFFFF",
-              lineNumbers: "on",
-              renderLineHighlight: "all",
-              renderLineHighlightOnlyWhenFocus: true,
-              renderFinalNewline: "dimmed",
-            });
-          }}
-        />
+        {isDark ? (
+          <DarkReadonlyEditor code={code} language={detectedLanguage} />
+        ) : (
+          <LightReadonlyEditor code={code} language={detectedLanguage} />
+        )}
       </div>
     </div>
   );
