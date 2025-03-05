@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { FaCode, FaCopy, FaCamera, FaCheck } from "react-icons/fa";
-import Editor from "@monaco-editor/react";
 import CreateSnapshotModal from "./create-snapshot-modal";
 import { detectLanguage } from "@/utils/detect-language";
 import "../../styles/editor-theme.css";
 // import RoomUsersCount from "@/components/features/room/room-users-count";
 import { useWebSocket } from "@/contexts/websocket-context";
+import { DarkWriteableEditor, LightWriteableEditor } from "./variants";
 
 /**
  * 실시간 세션용 코드 에디터 컴포넌트
@@ -268,64 +268,19 @@ export default function LiveSessionEditor({
 
       {/* Monaco 에디터 영역 */}
       <div className="flex-1 relative">
-        <Editor
-          width="100%"
-          height="100%"
-          language={detectedLanguage}
-          value={code}
-          onChange={handleCodeChange}
-          beforeMount={(monaco) => {
-            monaco.editor.addKeybindingRule({
-              keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF,
-              command: null,
-            });
-          }}
-          options={{
-            theme: isDark ? "vs-dark" : "vs",
-            fontSize: 14,
-            tabSize: 2,
-            padding: { top: 16, bottom: 16 },
-            quickSuggestions: {
-              other: true,
-              comments: false,
-              strings: false,
-            },
-            parameterHints: {
-              enabled: true,
-            },
-            folding: true,
-            foldingStrategy: "indentation",
-            wordWrap: "on",
-            links: false,
-            contextmenu: false,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            automaticLayout: true,
-            lineNumbers: "on",
-            readOnly: isDisabled,
-            fontFamily: "Monaco, 'Courier New', monospace",
-          }}
-          className={`rounded-lg border ${
-            isDark ? "border-gray-800" : "border-gray-200"
-          } shadow-sm`}
-          onMount={(editor, monaco) => {
-            editorRef.current = editor;
-            editor.addCommand(
-              monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_F,
-              () => {
-                // do nothing
-              }
-            );
-            setTimeout(() => {
-              editor.layout();
-            }, 100);
-            editor.updateOptions({
-              theme: isDark ? "vs-dark" : "vs",
-              foreground: isDark ? "#E4E4E7" : "#1F2937",
-              background: isDark ? "#18181B" : "#FFFFFF",
-            });
-          }}
-        />
+        {isDark ? (
+          <DarkWriteableEditor
+            code={code}
+            onChange={handleCodeChange}
+            language={detectedLanguage}
+          />
+        ) : (
+          <LightWriteableEditor
+            code={code}
+            onChange={handleCodeChange}
+            language={detectedLanguage}
+          />
+        )}
       </div>
 
       {/* 스냅샷 생성 모달 */}
