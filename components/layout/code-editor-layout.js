@@ -60,6 +60,7 @@ export default function CodeEditorLayout({
         <SnapshotEditor
           code={code}
           title={snapshots[currentVersion].title}
+          description={snapshots[currentVersion].description}
           isSidebarOpen={isSidebarOpen}
           isRightPanelOpen={!!activePanel}
         />
