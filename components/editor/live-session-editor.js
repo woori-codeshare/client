@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { FaCode, FaCopy, FaCamera, FaCheck } from "react-icons/fa";
+import { FaCode, FaCopy, FaCamera, FaCheck, FaEraser } from "react-icons/fa";
 import CreateSnapshotModal from "./create-snapshot-modal";
 import { detectLanguage } from "@/utils/detect-language";
 import "../../styles/editor-theme.css";
 // import RoomUsersCount from "@/components/features/room/room-users-count";
 import { useWebSocket } from "@/contexts/websocket-context";
 import { DarkWriteableEditor, LightWriteableEditor } from "./variants";
+import { INITIAL_CODE } from "@/constants/initial-data";
 
 /**
  * 실시간 세션용 코드 에디터 컴포넌트
@@ -181,6 +182,13 @@ export default function LiveSessionEditor({
     }
   };
 
+  /**
+   * 코드 초기화 처리
+   */
+  const handleClear = () => {
+    handleCodeChange(INITIAL_CODE);
+  };
+
   // 사이드바나 우측 패널 상태 변경시 에디터 크기 재조정
   useEffect(() => {
     if (editorRef.current) {
@@ -245,6 +253,20 @@ export default function LiveSessionEditor({
             >
               {copied ? <FaCheck size={14} /> : <FaCopy size={14} />}
             </button>
+
+            {/* 코드 초기화 버튼 */}
+            {!isDisabled && (
+              <button
+                onClick={handleClear}
+                className="p-2 text-gray-600 dark:text-gray-400 
+                  hover:text-blue-500 dark:hover:text-blue-400 
+                  transition-colors rounded 
+                  hover:bg-gray-100 dark:hover:bg-gray-800"
+                title="Clear Code"
+              >
+                <FaEraser size={14} />
+              </button>
+            )}
 
             {/* 스냅샷 생성 버튼 */}
             {!isDisabled && (
