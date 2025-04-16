@@ -1,9 +1,25 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
+interface VoteResultParams {
+  params: {
+    roomId: string;
+    snapshotId: string;
+    voteId: string;
+  };
+}
+
+/**
+ * 투표 결과 응답 DTO
+ */
+export interface VoteResultResponseDTO {
+  voteId: number;
+  voteCounts: Record<string, number>;
+}
 
 /**
  * 투표 결과 조회 요청
  */
-export async function GET(request, { params }) {
+export async function GET(request: NextRequest, { params }: VoteResultParams) {
   try {
     const { voteId } = await params;
 
@@ -28,7 +44,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({
       message: "투표 결과 조회에 성공했습니다.",
-      data: data.data,
+      data: data.data as VoteResultResponseDTO,
     });
   } catch (error) {
     console.error("투표 결과 조회 중 에러가 발생했습니다:", error);

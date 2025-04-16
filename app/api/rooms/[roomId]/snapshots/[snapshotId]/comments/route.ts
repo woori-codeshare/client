@@ -1,9 +1,46 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
+interface CommentParams {
+  params: {
+    roomId: string;
+    snapshotId: string;
+  };
+}
+
+/**
+ * 댓글 생성 요청 DTO
+ */
+export interface CreateCommentRequestDTO {
+  content: string;
+  parentCommentId?: number | null;
+}
+
+/**
+ * 댓글 생성 응답 DTO
+ */
+export interface CreateCommentResponseDTO {
+  commentId: number;
+  parentCommentId: number | null;
+  snapshotId: number;
+  content: string;
+}
+
+/**
+ * 댓글 목록 조회 응답 DTO
+ */
+export interface CommentResponseDTO {
+  commentId: number;
+  parentCommentId: number | null;
+  content: string;
+  solved: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 /**
  * 댓글 조회 요청
  */
-export async function GET(request, { params }) {
+export async function GET(request: NextRequest, { params }: CommentParams) {
   try {
     const { snapshotId } = await params;
     console.log("댓글 조회 요청...");
@@ -27,7 +64,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({
       message: "성공적으로 조회되었습니다.",
-      data: data.data,
+      data: data.data as CommentResponseDTO[],
     });
   } catch (error) {
     console.error("댓글 조회 중 에러가 발생했습니다:", error);
@@ -42,10 +79,10 @@ export async function GET(request, { params }) {
 /**
  * 질문/댓글 작성 요청
  */
-export async function POST(request, { params }) {
+export async function POST(request: NextRequest, { params }: CommentParams) {
   try {
     const { snapshotId } = await params;
-    const body = await request.json();
+    const body = (await request.json()) as CreateCommentRequestDTO;
 
     console.log("질문/댓글 작성 요청...");
 
@@ -81,7 +118,7 @@ export async function POST(request, { params }) {
 
     return NextResponse.json({
       message: successMessage,
-      data: data.data,
+      data: data.data as CreateCommentResponseDTO,
     });
   } catch (error) {
     console.error("질문/댓글 작성 중 에러가 발생했습니다:", error);
