@@ -1,12 +1,35 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
+interface ResolveParams {
+  params: {
+    roomId: string;
+    snapshotId: string;
+    commentId: string;
+  };
+}
+
+/**
+ * 댓글 해결 상태 변경 요청 DTO
+ */
+export interface ResolveCommentRequestDTO {
+  solved: boolean;
+}
+
+/**
+ * 댓글 해결 상태 변경 응답 DTO
+ */
+export interface ResolveCommentResponseDTO {
+  commentId: number;
+  solved: boolean;
+}
 
 /**
  * 댓글 해결 상태 변경 요청
  */
-export async function PATCH(request, { params }) {
+export async function PATCH(request: NextRequest, { params }: ResolveParams) {
   try {
     const { commentId } = await params;
-    const body = await request.json();
+    const body = (await request.json()) as ResolveCommentRequestDTO;
 
     console.log("댓글 해결 상태 변경 요청...");
 
@@ -34,7 +57,7 @@ export async function PATCH(request, { params }) {
 
     return NextResponse.json({
       message: "해결 상태가 성공적으로 변경되었습니다.",
-      data: data.data,
+      data: data.data as ResolveCommentResponseDTO,
     });
   } catch (error) {
     console.error("댓글 해결 상태 변경 중 에러가 발생했습니다:", error);
